@@ -3,7 +3,7 @@
 # run this script as root on EC2 machine.
 
 ## EDIT
-export S3_BUCKET="heroku-buildpack-php-tyler"
+export S3_BUCKET="hex-build"
 export LIBMCRYPT_VERSION="2.5.9"
 export PHP_VERSION="5.4.12"
 export APC_VERSION="3.1.10"
