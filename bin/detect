@@ -2,6 +2,8 @@
 
 if [ `find "$1" -type f -iname "index.php" 2> /dev/null | wc -l` -ge 1 ]; then
   echo "PHP" && exit 0
+else if [ `find "$1" -type f -iname "web/app.php" 2> /dev/null | wc -l` -ge 1 ]; then
+  echo "PHP" && exit 0 #Symfony2 App
 else
   echo "no" && exit 1
 fi
