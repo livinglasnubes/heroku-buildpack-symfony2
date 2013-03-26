@@ -15,7 +15,7 @@ S3_BUCKET=hex-build
 # END CONFIG
 
 #
-S3_URL="https://${S3_BUCKET}.s3.amazonaws.com/"
+S3_URL="https://${S3_BUCKET}.s3.amazonaws.com"
 
 MANIFEST_FILE="manifest.md5sum"
 NGINX_FILE="nginx-${NGINX_VERSION}-heroku.tar.gz"
