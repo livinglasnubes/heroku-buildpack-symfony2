@@ -6,4 +6,4 @@
 # -k <private key name as per EC2 console>
 # -t <instance type, m1.small or c1.small>
 
-ec2run ami-3c5f5748 $@
+ec2run ami-04c9306d $@
