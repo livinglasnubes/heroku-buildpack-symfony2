@@ -216,7 +216,6 @@ echo "-----> Installing less"
 echo "-----> Hacking less & node path"
         ln -s '${BUILD_DIR}/vendor/node/' '/app/vendor/node'
         export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
-        less -v
 
 
 # newrelic
