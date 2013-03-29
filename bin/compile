@@ -210,6 +210,9 @@ mkdir -p ${BUILD_DIR}/vendor/node
 tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
 export PATH="$PATH:${BUILD_DIR}/vendor/node"
 node -v
+echo "-----> Installing less"
+npm install -g less
+
 
 # newrelic
 echo "-----> Installing newrelic"
