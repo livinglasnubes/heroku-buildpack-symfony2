@@ -15,15 +15,15 @@ mkdir -p build && pushd build
 echo "+ Fetching libmcrypt libraries..."
 # install mcrypt for portability.
 mkdir -p /app/local
-curl -L "https://s3.amazonaws.com/${S3_BUCKET}/libmcrypt-${LIBMCRYPT_VERSION}.tar.gz" -o - | tar xz -C /app/local
+curl -L "https://${S3_BUCKET}.s3.amazonaws.com/libmcrypt-${LIBMCRYPT_VERSION}.tar.gz" -o - | tar xz -C /app/local
 
 echo "+ Fetching libmemcached libraries..."
 mkdir -p /app/local
-curl -L "https://s3.amazonaws.com/${S3_BUCKET}/libmemcached-${LIBMEMCACHED_VERSION}.tar.gz" -o - | tar xz -C /app/local
+curl -L "https://${S3_BUCKET}.s3.amazonaws.com/libmemcached-${LIBMEMCACHED_VERSION}.tar.gz" -o - | tar xz -C /app/local
 
 echo "+ Fetching libicu libraries..."
 mkdir -p /app/local
-curl -L "https://s3.amazonaws.com/${S3_BUCKET}/libicu-${LIBICU_VERSION}.tar.gz" -o - | tar xz -C /app/local
+curl -L "https://${S3_BUCKET}.s3.amazonaws.com/libicu-${LIBICU_VERSION}.tar.gz" -o - | tar xz -C /app/local
 
 echo "+ Fetching PHP sources..."
 #fetch php, extract
