@@ -25,7 +25,7 @@ MEMCACHED_FILE="libmemcached-${LIBMEMCACHED_VERSION}.tar.gz"
 ICU_FILE="libicu-${LIBICU_VERSION}.tar.gz"
 PHP_FILE="php-${PHP_VERSION}-with-fpm-heroku.tar.gz"
 NEWRELIC_FILE="newrelic-${NEWRELIC_VERSION}-heroku.tar.gz"
-NODE_FILE="node-${NODE_VERSION}.tar.gz"
+NODE_FILE="node-${NODE_VERSION}-heroku.tar.gz"
 
 MANIFEST_URL="${S3_URL}/${MANIFEST_FILE}"
 NGINX_URL="${S3_URL}/${NGINX_FILE}"
@@ -188,7 +188,7 @@ mkdir -p ${BUILD_DIR}/vendor/php
 tar xzf ${PHP_FILE} -C ${BUILD_DIR}/vendor/php
 
 # NODE
-echo "-----> Installing Node.js"
+echo "-----> Installing Node"
 if [ -f "$NODE_FILE" ]
 then
 	if check_md5 "${NODE_FILE}"

@@ -31,11 +31,11 @@ pushd node-v${node_version}
 echo "Use vulcan to build Node for Heroku instance..."
 vulcan build -v -o $tempdir/node-${node_version}-heroku.tar.gz
 
-# upload nodejs to s3
+popd
+popd
+
 cp $tempdir/node-${node_version}-heroku.tar.gz .
 echo "+ Binaries available at ./node-${node_version}-heroku.tar.gz"
 
-popd
-popd
 
 echo "+ Upload this package to Amazon S3."
