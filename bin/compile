@@ -302,7 +302,7 @@ echo "-----> Installing assets"
 export SF_DEBUG="--no-debug"
 export SF_ENV="prod"
 
- echo "<?php phpinfo() ?>" | php
+ echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
 
 # Deploying assets - for some reason cd is neccesary
 cd ${BUILD_DIR}
