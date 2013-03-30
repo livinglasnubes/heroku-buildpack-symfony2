@@ -59,6 +59,32 @@ function download_url() {
 	curl -s -S -O -L -m 300 --connect-timeout 60 "$TARGET_URL"
 }
 
+# package params: name file version url target
+function install {
+    echo "-----> Installing ${1}"
+    if [ -f $2 ]
+    then
+            # check manifest
+            if check_md5 $2
+            then
+                    echo "Bundling Nginx v${3}" | indent
+                    echo ${NGINX_URL} | indent
+                    download_url ${NGINX_URL}
+            else
+                    echo "Using cached Nginx v${3}" | indent
+            fi
+    else
+            # fetch
+            echo "Bundling Nginx v${3}" | indent
+            echo $4 | indent
+            download_url $4
+    fi
+
+    mkdir -p $5
+    tar xzf $2 -C $5
+}
+
+
 BIN_DIR=$(dirname $0)
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -83,28 +109,29 @@ echo "-----> Fetching Manifest"
 echo ${MANIFEST_URL} | indent
 download_url ${MANIFEST_URL}
 
-# Nginx
-echo "-----> Installing Nginx"
-if [ -f "${NGINX_FILE}" ]
-then
-	# check manifest
-	if check_md5 "${NGINX_FILE}"
-	then
-		echo "Bundling Nginx v${NGINX_VERSION}" | indent
-		echo ${NGINX_URL} | indent
-		download_url ${NGINX_URL}
-	else
-		echo "Using cached Nginx v${NGINX_VERSION}" | indent
-	fi
-else
-	# fetch
-	echo "Bundling Nginx v${NGINX_VERSION}" | indent
-	echo ${NGINX_URL} | indent
-	download_url ${NGINX_URL}
-fi
+# Nginx name file version url target
+install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
+#echo "-----> Installing Nginx"
+#if [ -f "${NGINX_FILE}" ]
+#then
+#	# check manifest
+#	if check_md5 "${NGINX_FILE}"
+#	then
+#		echo "Bundling Nginx v${NGINX_VERSION}" | indent
+#		echo ${NGINX_URL} | indent
+#		download_url ${NGINX_URL}
+#	else
+#		echo "Using cached Nginx v${NGINX_VERSION}" | indent
+#	fi
+#else
+#	# fetch
+#	echo "Bundling Nginx v${NGINX_VERSION}" | indent
+#	echo ${NGINX_URL} | indent
+#	download_url ${NGINX_URL}
+#fi
 
-mkdir -p ${BUILD_DIR}/vendor/nginx
-tar xzf ${NGINX_FILE} -C ${BUILD_DIR}/vendor/nginx
+#mkdir -p ${BUILD_DIR}/vendor/nginx
+#tar xzf ${NGINX_FILE} -C ${BUILD_DIR}/vendor/nginx
 
 # libmcrypt
 echo "-----> Installing libmcrypt"
@@ -246,6 +273,7 @@ echo "-----> Copying config files"
 cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/vendor/php/etc/php-fpm.conf
 mkdir -p ${BUILD_DIR}/web/server
 cp ${BUILD_DIR}/vendor/php/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
+echo "<?php phpinfo() ?>" > ${BUILD_DIR}/web/server/infos.php
 cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/php.ini
 cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/vendor/php/
 cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
@@ -280,8 +308,18 @@ then
 	sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/vendor/php/bin/php.ini
 
 
+        # ini parameters file
 	if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
+            if [ -r ${BUILD_DIR}/app/config/parameters_prod.ini.erb ]; then
 			erb ${BUILD_DIR}/app/config/parameters_prod.ini.erb > ${BUILD_DIR}/app/config/parameters.ini
+            fi
+	fi
+
+        # yml parameters file
+	if [ ! -r ${BUILD_DIR}/app/config/parameters.yml ]; then
+            if [ -r ${BUILD_DIR}/app/config/parameters_prod.yml.erb ]; then
+			erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
+            fi
 	fi
 
 	# Debug info for php.ini
@@ -322,6 +360,10 @@ if [ -d /app/conf ]; then
 	# Symfony2 database detection
 	if [ -r /app/app/config/parameters_prod.yml.erb ]; then
 		erb /app/app/config/parameters_prod.yml.erb > /app/app/config/parameters.yml
+	fi
+
+	if [ -r /app/app/config/parameters_prod.ini.erb ]; then
+		erb /app/app/config/parameters_prod.ini.erb > /app/app/config/parameters.ini
 	fi
 
 	mkdir -p /app/conf/nginx.d

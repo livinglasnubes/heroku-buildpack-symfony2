@@ -67,7 +67,7 @@ http {
     }
 
     # Status. /status.html uses /status
-    location ~ ^/(status|ping)$ {
+    location ~ ^/(status|ping|infos)$ {
       include         /app/vendor/nginx/conf/fastcgi_params;
       fastcgi_param   HTTPS $my_https if_not_empty;
       fastcgi_pass    php_fpm;
