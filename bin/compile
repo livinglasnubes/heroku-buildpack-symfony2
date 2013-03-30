@@ -105,7 +105,6 @@ fi
 
 mkdir -p ${BUILD_DIR}/vendor/nginx
 tar xzf ${NGINX_FILE} -C ${BUILD_DIR}/vendor/nginx
-rm ${NGINX_FILE}
 
 # libmcrypt
 echo "-----> Installing libmcrypt"
@@ -126,28 +125,26 @@ else
 fi
 
 tar xzf ${MCRYPT_FILE} -C ${BUILD_DIR}/local
-rm ${MCRYPT_FILE}
 
 # libmemcached
-echo "-----> Installing libmemcached"
-if [ -f "${MEMCACHED_FILE}" ]
-then
-	if check_md5 "${MEMCACHED_FILE}"
-	then
-		echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
-		echo ${MEMCACHED_URL} | indent
-		download_url ${MEMCACHED_URL}
-	else
-		echo "Using cached libmemcached v${LIBMEMCACHED_VERSION}" | indent
-	fi
-else
-	echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
-	echo ${MEMCACHED_URL} | indent
-	download_url ${MEMCACHED_URL}
-fi
-
-tar xzf ${MEMCACHED_FILE} -C ${BUILD_DIR}/local
-rm ${MEMCACHED_FILE}
+#echo "-----> Installing libmemcached"
+#if [ -f "${MEMCACHED_FILE}" ]
+#then
+#	if check_md5 "${MEMCACHED_FILE}"
+#	then
+#		echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
+#		echo ${MEMCACHED_URL} | indent
+#		download_url ${MEMCACHED_URL}
+#	else
+#		echo "Using cached libmemcached v${LIBMEMCACHED_VERSION}" | indent
+#	fi
+#else
+#	echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
+#	echo ${MEMCACHED_URL} | indent
+#	download_url ${MEMCACHED_URL}
+#fi
+#
+#tar xzf ${MEMCACHED_FILE} -C ${BUILD_DIR}/local
 
 # libicu
 echo "-----> Installing libicu"
@@ -168,7 +165,6 @@ else
 fi
 
 tar xzf ${ICU_FILE} -C ${BUILD_DIR}/local
-rm  ${ICU_FILE}
 
 # PHP
 echo "-----> Installing PHP"
@@ -190,7 +186,6 @@ fi
 
 mkdir -p ${BUILD_DIR}/vendor/php
 tar xzf ${PHP_FILE} -C ${BUILD_DIR}/vendor/php
-rm ${PHP_FILE}
 
 # NODE
 echo "-----> Installing Node"
@@ -213,7 +208,6 @@ fi
 
         mkdir -p ${BUILD_DIR}/vendor/node
         tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
-        rm ${NODE_FILE}
         export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
         node -v
 
