@@ -281,6 +281,10 @@ if [ -d /app/conf/nginx.d ]; then
 	done
 fi
 
+nginx -t
+
+exit 1
+
 # Set NEWRELIC key
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a -x "/app/local/bin/newrelic-license" ]; then
 	echo "NEWRELIC license setted to ${NEW_RELIC_LICENSE_KEY}"
