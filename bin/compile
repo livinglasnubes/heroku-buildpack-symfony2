@@ -215,9 +215,8 @@ echo "-----> Installing less"
         npm install -g less
 echo "-----> Hacking less & node path"
         ln -s '${BUILD_DIR}/vendor/node/' '/app/vendor/node'
-        ln -s '${BUILD_DIR}/node_modules' '/app/node_modules'
         export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
-        lessc -v || less -v
+        lessc -v
 
 # newrelic
 echo "-----> Installing newrelic"
@@ -268,6 +267,7 @@ then
 
 	if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
 			erb ${BUILD_DIR}/app/config/parameters_prod.ini.erb > ${BUILD_DIR}/app/config/parameters.ini
+                        echo "less_path = ${BUILD_DIR}"
 	fi
 
 	# Debug info for php.ini
