@@ -204,11 +204,11 @@ else
 	echo ${NODE_URL} | indent
 	download_url ${NODE_URL}
 fi
-        rm $NODE_FILE
 
 
         mkdir -p ${BUILD_DIR}/vendor/node
         tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
+        rm $NODE_FILE
         export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
         node -v
 
