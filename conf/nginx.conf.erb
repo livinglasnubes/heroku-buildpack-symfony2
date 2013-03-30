@@ -71,25 +71,68 @@ http {
         }
 
         root              /app/web;
-#        server {
-#          listen            <%= ENV['PORT'] %>;
-#          root              /app/web;
-#          server_name       _;
-#
-#          # Status. /status.html uses /status
-#          location ~ ^/(status|ping|infos)$ {
-#            include         /app/vendor/nginx/conf/fastcgi_params;
-#            fastcgi_param   HTTPS $my_https if_not_empty;
-#            fastcgi_pass    phpfcgi;
-#            fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
-#          }
-#
-#          location /server-status {
-#            stub_status on;
-#            access_log   off;
-#          }
-#
-#        }
-        include /app/conf/nginx.d/*.conf;
+        server {
+            listen            <%= ENV['PORT'] %>;
+            root              /app/web;
+            server_name       _;
+
+            # Status. /status.html uses /status
+            location ~ ^/(status|ping|infos)$ {
+              include         /app/vendor/nginx/conf/fastcgi_params;
+              fastcgi_param   HTTPS $my_https if_not_empty;
+              fastcgi_pass    phpfcgi;
+              fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            }
+
+            location /server-status {
+              stub_status on;
+              access_log   off;
+            }
+
+            error_log           /app/app/logs/error.log;
+            access_log          /app/app/logs/access.log;
+
+            # Some basic cache-control for static files to be sent to the browser
+            location ~* \.(?:ico|css|less|js|gif|jpeg|jpg|png)$ {
+                expires         max;
+                add_header      Pragma public;
+                add_header      Cache-Control "public, must-revalidate, proxy-revalidate";
+            }
+
+            # Deny hidden files (.htaccess, .htpasswd, .DS_Store).
+            location ~ /\. {
+              deny            all;
+              access_log      off;
+              log_not_found   off;
+            }
+
+            location = /robots.txt {
+              allow           all;
+              log_not_found   off;
+              access_log      off;
+            }
+
+            location @rewriteapp {
+                rewrite         ^(.*)$ /app.php/$1 last;
+            }
+
+            location / {
+                index           app.php;
+                try_files       $uri @rewriteapp;
+            }
+
+            # pass the PHP scripts to FastCGI server from upstream phpfcgi
+            location ~ ^/(app|app_dev|config|check|apc)\.php(/|$) {
+                try_files $uri =404;
+                limit_conn phplimit 5; # limit to 5 concurrent users to PHP per IP.
+                fastcgi_pass phpfcgi;
+                fastcgi_split_path_info ^(.+\.php)(/.*)$;
+                include /app/vendor/nginx/conf/fastcgi_params;
+                fastcgi_param  SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                fastcgi_param  HTTPS off;
+            }
+            include /app/conf/nginx.d/*.conf;
+
+        }
 
 }
