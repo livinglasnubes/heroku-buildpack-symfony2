@@ -61,7 +61,7 @@ function download_url() {
 
 # package params: name file version url target
 function install {
-    echo "-----> Installing ${1} v${3} into ${5}"
+    echo "-----> Installing ${1} v${3}"
     if [ -f $2 ]
     then
             # check manifest
@@ -116,14 +116,11 @@ download_url ${MANIFEST_URL}
 # Nginx name file version url target
 install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
 
-
-# libmcrypt
-install "libmcrypt" ${MCRYPT_FILE} ${MCRYPT_VERSION} ${MCRYPT_URL} ${BUILD_DIR}/local
-
-
 # libmemcached
 install "libmemcached" $MEMCACHED_FILE $MEMCACHED_VERSION $MEMCACHED_URL ${BUILD_DIR}/local
 
+# libmcrypt
+install "libmcrypt" ${MCRYPT_FILE} ${MCRYPT_VERSION} ${MCRYPT_URL} ${BUILD_DIR}/local
 
 # libicu
 install "libicu" $ICU_FILE $ICU_VERSION $ICU_URL ${BUILD_DIR}/local
