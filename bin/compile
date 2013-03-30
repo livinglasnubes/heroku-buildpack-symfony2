@@ -79,8 +79,11 @@ function install {
             echo $4 | indent
             download_url $4
     fi
-
-    mkdir -p $5
+    
+    if [ ! -d $5 ]; then
+        mkdir -p $5
+    fi
+    
     tar xzf $2 -C $5
 }
 
