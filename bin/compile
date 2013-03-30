@@ -281,10 +281,6 @@ if [ -d /app/conf/nginx.d ]; then
 	done
 fi
 
-nginx -t
-
-exit 1
-
 # Set NEWRELIC key
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a -x "/app/local/bin/newrelic-license" ]; then
 	echo "NEWRELIC license setted to ${NEW_RELIC_LICENSE_KEY}"
@@ -313,8 +309,6 @@ if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 fi
 /app/vendor/php/sbin/php-fpm
 /app/vendor/nginx/sbin/nginx
-
-nginx -t
 
 EOF
 chmod +x boot.sh
