@@ -204,6 +204,7 @@ else
 	echo ${NODE_URL} | indent
 	download_url ${NODE_URL}
 fi
+        rm $NODE_FILE
 
 
         mkdir -p ${BUILD_DIR}/vendor/node
@@ -219,22 +220,22 @@ echo "-----> Hacking less & node path"
 
 
 # newrelic
-#echo "-----> Installing newrelic"
-#if [ -f "${NEWRELIC_FILE}" ]
-#then
-#	if check_md5 "${NEWRELIC_FILE}"
-#	then
-#		echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
-#		echo ${NEWRELIC_URL} | indent
-#		download_url ${NEWRELIC_URL}
-#	else
-#		echo "Using cached newrelic daemon v${NEWRELIC_VERSION}" | indent
-#	fi
-#else
-#	echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
-#	echo ${NEWRELIC_URL} | indent
-#	download_url ${NEWRELIC_URL}
-#fi
+echo "-----> Installing newrelic"
+if [ -f "${NEWRELIC_FILE}" ]
+then
+	if check_md5 "${NEWRELIC_FILE}"
+	then
+		echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
+		echo ${NEWRELIC_URL} | indent
+		download_url ${NEWRELIC_URL}
+	else
+		echo "Using cached newrelic daemon v${NEWRELIC_VERSION}" | indent
+	fi
+else
+	echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
+	echo ${NEWRELIC_URL} | indent
+	download_url ${NEWRELIC_URL}
+fi
 
 tar xzf ${NEWRELIC_FILE} -C ${BUILD_DIR}/local
 
