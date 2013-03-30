@@ -297,8 +297,8 @@ cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 #erb $LP_DIR/conf/nginx.conf.erb > ${BUILD_DIR}/vendor/nginx/conf/nginx.conf
 
-${BUILD_DIR}/vendor/php/bin/php -v
-echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -v
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
 
 echo "-----> Installing assets"
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
