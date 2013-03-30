@@ -259,7 +259,7 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 #erb $LP_DIR/conf/nginx.conf.erb > ${BUILD_DIR}/vendor/nginx/conf/nginx.conf
 
 LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -v
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
+echo "<?php phpinfo() ?>" | LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php
 
 # Composer Installation
 pushd ${BUILD_DIR} > /dev/null
