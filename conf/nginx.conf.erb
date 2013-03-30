@@ -71,25 +71,25 @@ http {
         }
 
         root              /app/web;
-        server {
-          listen            <%= ENV['PORT'] %>;
-          root              /app/web;
-          server_name       _;
-
-          # Status. /status.html uses /status
-          location ~ ^/(status|ping|infos)$ {
-            include         /app/vendor/nginx/conf/fastcgi_params;
-            fastcgi_param   HTTPS $my_https if_not_empty;
-            fastcgi_pass    phpfcgi;
-            fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
-          }
-
-          location /server-status {
-            stub_status on;
-            access_log   off;
-          }
-
-        }
+#        server {
+#          listen            <%= ENV['PORT'] %>;
+#          root              /app/web;
+#          server_name       _;
+#
+#          # Status. /status.html uses /status
+#          location ~ ^/(status|ping|infos)$ {
+#            include         /app/vendor/nginx/conf/fastcgi_params;
+#            fastcgi_param   HTTPS $my_https if_not_empty;
+#            fastcgi_pass    phpfcgi;
+#            fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;
+#          }
+#
+#          location /server-status {
+#            stub_status on;
+#            access_log   off;
+#          }
+#
+#        }
         include /app/conf/nginx.d/*.conf;
 
 }
