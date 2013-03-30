@@ -288,7 +288,7 @@ then
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
 
 	# do the deed!
-	echo "Running: php composer.phar install --prefer-dist -n" | indent
+	echo "Running: php composer.phar install --prefer-dist -n --no-progress -o" | indent
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install --prefer-dist -n | indent
 
 	export GIT_DIR=${GIT_DIR_ORIG}
