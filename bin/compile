@@ -105,7 +105,7 @@ fi
 
 mkdir -p ${BUILD_DIR}/vendor/nginx
 tar xzf ${NGINX_FILE} -C ${BUILD_DIR}/vendor/nginx
-#rm ${NGINX_FILE}
+rm ${NGINX_FILE}
 
 # libmcrypt
 echo "-----> Installing libmcrypt"
@@ -126,7 +126,7 @@ else
 fi
 
 tar xzf ${MCRYPT_FILE} -C ${BUILD_DIR}/local
-#rm ${MCRYPT_FILE}
+rm ${MCRYPT_FILE}
 
 # libmemcached
 echo "-----> Installing libmemcached"
@@ -147,7 +147,7 @@ else
 fi
 
 tar xzf ${MEMCACHED_FILE} -C ${BUILD_DIR}/local
-#rm ${MEMCACHED_FILE}
+rm ${MEMCACHED_FILE}
 
 # libicu
 echo "-----> Installing libicu"
@@ -309,10 +309,10 @@ export SF_ENV="prod"
 
 # Deploying assets - for some reason cd is neccesary
 cd ${BUILD_DIR}
-echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink
-echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump
+#echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
+#LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink
+#echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
+#LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump
 
 
 echo "-----> Installing boot script"
