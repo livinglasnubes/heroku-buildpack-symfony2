@@ -188,34 +188,34 @@ mkdir -p ${BUILD_DIR}/vendor/php
 tar xzf ${PHP_FILE} -C ${BUILD_DIR}/vendor/php
 
 # NODE
-echo "-----> Installing Node"
-if [ -f "$NODE_FILE" ]
-then
-	if check_md5 "${NODE_FILE}"
-	then
-		echo "Bundling Node v${NODE_VERSION}" | indent
-		echo ${NODE_URL} | indent
-		download_url ${NODE_URL}
-	else
-		echo "Using cached Node v${NODE_VERSION}" | indent
-	fi
-else
-	echo "Bundling Node v${NODE_VERSION}" | indent
-	echo ${NODE_URL} | indent
-	download_url ${NODE_URL}
-fi
+#echo "-----> Installing Node"
+#if [ -f "$NODE_FILE" ]
+#then
+#	if check_md5 "${NODE_FILE}"
+#	then
+#		echo "Bundling Node v${NODE_VERSION}" | indent
+#		echo ${NODE_URL} | indent
+#		download_url ${NODE_URL}
+#	else
+#		echo "Using cached Node v${NODE_VERSION}" | indent
+#	fi
+#else
+#	echo "Bundling Node v${NODE_VERSION}" | indent
+#	echo ${NODE_URL} | indent
+#	download_url ${NODE_URL}
+#fi
 
 
-        mkdir -p ${BUILD_DIR}/vendor/node
-        tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
-        export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
-        node -v
+#        mkdir -p ${BUILD_DIR}/vendor/node
+#        tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
+#        export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
+#        node -v
 
-echo "-----> Installing less"
-        npm install -g less
-echo "-----> Hacking less & node path"
-        ln -s ${BUILD_DIR}/vendor/node/ /app/vendor/node
-        export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
+#echo "-----> Installing less"
+#        npm install -g less
+#echo "-----> Hacking less & node path"
+#        ln -s ${BUILD_DIR}/vendor/node/ /app/vendor/node
+#        export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
 
 
 # newrelic
