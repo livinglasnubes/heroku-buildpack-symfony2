@@ -61,7 +61,7 @@ function download_url() {
 
 # package params: name file version url target
 function install {
-    echo "-----> Installing ${1}"
+    echo "-----> Installing ${1} v${3} into ${5}"
     if [ -f $2 ]
     then
             # check manifest
