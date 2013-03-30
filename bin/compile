@@ -246,6 +246,21 @@ tar xzf ${NEWRELIC_FILE} -C ${BUILD_DIR}/local
 
 popd > /dev/null
 
+
+# Config files
+echo "-----> Copying config files"
+cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/vendor/php/etc/php-fpm.conf
+mkdir -p ${BUILD_DIR}/web/server
+cp ${BUILD_DIR}/vendor/php/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
+cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/php.ini
+cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/vendor/php/
+cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
+cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
+#erb $LP_DIR/conf/nginx.conf.erb > ${BUILD_DIR}/vendor/nginx/conf/nginx.conf
+
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -v
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
+
 # Composer Installation
 pushd ${BUILD_DIR} > /dev/null
 
@@ -286,19 +301,6 @@ then
 fi
 popd > /dev/null
 
-# Config files
-echo "-----> Copying config files"
-cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/vendor/php/etc/php-fpm.conf
-mkdir -p ${BUILD_DIR}/web/server
-cp ${BUILD_DIR}/vendor/php/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
-cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/php.ini
-cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/vendor/php/
-cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
-cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
-#erb $LP_DIR/conf/nginx.conf.erb > ${BUILD_DIR}/vendor/nginx/conf/nginx.conf
-
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -v
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" echo "<?php phpinfo() ?>" | ${BUILD_DIR}/vendor/php/bin/php
 
 echo "-----> Installing assets"
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
