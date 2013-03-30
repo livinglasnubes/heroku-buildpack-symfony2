@@ -118,7 +118,7 @@ install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
 
 
 # libmcrypt
-install "libmcrypt" $MCRYPT_FILE $MCRYPT_VERSION $MCRYPT_URL ${BUILD_DIR}/local
+install "libmcrypt" ${MCRYPT_FILE} ${MCRYPT_VERSION} ${MCRYPT_URL} ${BUILD_DIR}/local
 
 
 # libmemcached
