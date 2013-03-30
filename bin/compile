@@ -204,13 +204,13 @@ tar xzf ${PHP_FILE} -C ${BUILD_DIR}/vendor/php
 #	echo ${NODE_URL} | indent
 #	download_url ${NODE_URL}
 #fi
-
-
+#
+#
 #        mkdir -p ${BUILD_DIR}/vendor/node
 #        tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
 #        export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
 #        node -v
-
+#
 #echo "-----> Installing less"
 #        npm install -g less
 #echo "-----> Hacking less & node path"
@@ -288,8 +288,8 @@ then
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
 
 	# do the deed!
-	echo "Running: php composer.phar install" | indent
-	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install -n | indent
+	echo "Running: php composer.phar install --prefer-dist -n" | indent
+	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install --prefer-dist -n | indent
 
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
