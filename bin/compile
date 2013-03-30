@@ -67,15 +67,15 @@ function install {
             # check manifest
             if check_md5 $2
             then
-                    echo "Bundling Nginx v${3}" | indent
+                    echo "Bundling ${1} v${3}" | indent
                     echo ${NGINX_URL} | indent
                     download_url ${NGINX_URL}
             else
-                    echo "Using cached Nginx v${3}" | indent
+                    echo "Using cached ${1} v${3}" | indent
             fi
     else
             # fetch
-            echo "Bundling Nginx v${3}" | indent
+            echo "Bundling ${1} v${3}" | indent
             echo $4 | indent
             download_url $4
     fi
@@ -109,161 +109,45 @@ echo "-----> Fetching Manifest"
 echo ${MANIFEST_URL} | indent
 download_url ${MANIFEST_URL}
 
+
 # Nginx name file version url target
 install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
-#echo "-----> Installing Nginx"
-#if [ -f "${NGINX_FILE}" ]
-#then
-#	# check manifest
-#	if check_md5 "${NGINX_FILE}"
-#	then
-#		echo "Bundling Nginx v${NGINX_VERSION}" | indent
-#		echo ${NGINX_URL} | indent
-#		download_url ${NGINX_URL}
-#	else
-#		echo "Using cached Nginx v${NGINX_VERSION}" | indent
-#	fi
-#else
-#	# fetch
-#	echo "Bundling Nginx v${NGINX_VERSION}" | indent
-#	echo ${NGINX_URL} | indent
-#	download_url ${NGINX_URL}
-#fi
 
-#mkdir -p ${BUILD_DIR}/vendor/nginx
-#tar xzf ${NGINX_FILE} -C ${BUILD_DIR}/vendor/nginx
 
 # libmcrypt
-echo "-----> Installing libmcrypt"
-if [ -f "${MCRYPT_FILE}" ]
-then
-	if check_md5 "${MCRYPT_FILE}"
-	then
-		echo "Bundling libmcrypt v${LIBMCRYPT_VERSION}" | indent
-		echo ${MCRYPT_URL} | indent
-		download_url ${MCRYPT_URL}
-	else
-		echo "Using cached libmcrypt v${LIBMCRYPT_VERSION}" | indent
-	fi
-else
-	echo "Bundling libmcrypt v${LIBMCRYPT_VERSION}" | indent
-	echo ${MCRYPT_URL} | indent
-	download_url ${MCRYPT_URL}
-fi
+install "libmcrypt" $MCRYPT_FILE $MCRYPT_VERSION $MCRYPT_URL ${BUILD_DIR}/local
 
-tar xzf ${MCRYPT_FILE} -C ${BUILD_DIR}/local
 
 # libmemcached
-echo "-----> Installing libmemcached"
-if [ -f "${MEMCACHED_FILE}" ]
-then
-	if check_md5 "${MEMCACHED_FILE}"
-	then
-		echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
-		echo ${MEMCACHED_URL} | indent
-		download_url ${MEMCACHED_URL}
-	else
-		echo "Using cached libmemcached v${LIBMEMCACHED_VERSION}" | indent
-	fi
-else
-	echo "Bundling libmemcached v${LIBMEMCACHED_VERSION}" | indent
-	echo ${MEMCACHED_URL} | indent
-	download_url ${MEMCACHED_URL}
-fi
+install "libmemcached" $MEMCACHED_FILE $MEMCACHED_VERSION $MEMCACHED_URL ${BUILD_DIR}/local
 
-tar xzf ${MEMCACHED_FILE} -C ${BUILD_DIR}/local
 
 # libicu
-echo "-----> Installing libicu"
-if [ -f "${ICU_FILE}" ]
-then
-	if check_md5 "${ICU_FILE}"
-	then
-		echo "Bundling libicu v${LIBICU_VERSION}" | indent
-		echo ${ICU_URL} | indent
-		download_url ${ICU_URL}
-	else
-		echo "Using cached libicu v${LIBICU_VERSION}" | indent
-	fi
-else
-	echo "Bundling libicu v${LIBICU_VERSION}" | indent
-	echo ${ICU_URL} | indent
-	download_url ${ICU_URL}
-fi
+install "libicu" $ICU_FILE $ICU_VERSION $ICU_URL ${BUILD_DIR}/local
 
-tar xzf ${ICU_FILE} -C ${BUILD_DIR}/local
 
 # PHP
-echo "-----> Installing PHP"
-if [ -f "$PHP_FILE" ]
-then
-	if check_md5 "${PHP_FILE}"
-	then
-		echo "Bundling PHP v${PHP_VERSION}" | indent
-		echo ${PHP_URL} | indent
-		download_url ${PHP_URL}
-	else
-		echo "Using cached PHP v${PHP_VERSION}" | indent
-	fi
-else
-	echo "Bundling PHP v${PHP_VERSION}" | indent
-	echo ${PHP_URL} | indent
-	download_url ${PHP_URL}
-fi
+install "PHP" $PHP_FILE $PHP_VERSION $PHP_URL ${BUILD_DIR}/vendor/php
 
-mkdir -p ${BUILD_DIR}/vendor/php
-tar xzf ${PHP_FILE} -C ${BUILD_DIR}/vendor/php
+
+# newrelic
+install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/local
+
 
 # NODE
-echo "-----> Installing Node"
-if [ -f "$NODE_FILE" ]
-then
-	if check_md5 "${NODE_FILE}"
-	then
-		echo "Bundling Node v${NODE_VERSION}" | indent
-		echo ${NODE_URL} | indent
-		download_url ${NODE_URL}
-	else
-		echo "Using cached Node v${NODE_VERSION}" | indent
-	fi
-else
-	echo "Bundling Node v${NODE_VERSION}" | indent
-	echo ${NODE_URL} | indent
-	download_url ${NODE_URL}
-fi
-
-
-        mkdir -p ${BUILD_DIR}/vendor/node
-        tar xzf ${NODE_FILE} -C ${BUILD_DIR}/vendor/node
+install "Node" $NODE_FILE $NODE_VERSION $NODE_URL ${BUILD_DIR}/vendor/node
         export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
         node -v
 
+
 echo "-----> Installing less"
         npm install -g less
+
+
 echo "-----> Hacking less & node path"
         ln -s ${BUILD_DIR}/vendor/node/ /app/vendor/node
         export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
 
-
-# newrelic
-echo "-----> Installing newrelic"
-if [ -f "${NEWRELIC_FILE}" ]
-then
-	if check_md5 "${NEWRELIC_FILE}"
-	then
-		echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
-		echo ${NEWRELIC_URL} | indent
-		download_url ${NEWRELIC_URL}
-	else
-		echo "Using cached newrelic daemon v${NEWRELIC_VERSION}" | indent
-	fi
-else
-	echo "Bundling newrelic daemon v${NEWRELIC_VERSION}" | indent
-	echo ${NEWRELIC_URL} | indent
-	download_url ${NEWRELIC_URL}
-fi
-
-tar xzf ${NEWRELIC_FILE} -C ${BUILD_DIR}/local
 
 popd > /dev/null
 
