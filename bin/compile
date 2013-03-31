@@ -212,7 +212,7 @@ echo "-----> Ping php"
 if php -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
-        export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}" '${PHP_TEMP_ROOT}/bin/php' -r "phpinfo();" | grep -i 'memcache'
+        export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}" php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
         php -r "phpinfo();" | grep -i 'apc'
 else
