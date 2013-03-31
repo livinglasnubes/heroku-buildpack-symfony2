@@ -212,7 +212,7 @@ then
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
         
         # Check if apc & memcache[d] are here
-        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();"
+        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'apc'
 
 	echo "-----> Composer install"
 	# do the deed!
@@ -229,6 +229,7 @@ cd ${BUILD_DIR}
 LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
 #echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
 LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
+
 
 echo "-----> Installing boot script"
 cd $BUILD_DIR
