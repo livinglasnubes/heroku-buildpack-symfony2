@@ -189,7 +189,9 @@ then
 
 	# Deactivating plugins from php.ini (they won't be found)
 	sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/vendor/php/bin/php.ini
-
+        
+        #Adding extentions
+        echo "extension_dir=${BUILD_DIR}/vendor/php/etc.d/" >> ${BUILD_DIR}/vendor/php/bin/php.ini
 
         # ini parameters file
 	if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
