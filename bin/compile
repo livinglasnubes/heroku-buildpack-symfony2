@@ -207,6 +207,7 @@ sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/${PHP_PATH}/bin/ph
 
 echo "-----> Ping php"
 # Debug info for php.ini
+php -v
 php -r "phpinfo();" | grep 'Configuration File' | indent
 
 # Check if apc & memcache[d] are here
