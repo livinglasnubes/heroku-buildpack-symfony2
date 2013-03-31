@@ -167,9 +167,12 @@ fi
 cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
+echo "-----> Checking deps"
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep apc
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep memcache
+
 # Composer Installation
 pushd ${BUILD_DIR} > /dev/null
-
 
 if [ -f "composer.json" ]
 then
@@ -216,9 +219,6 @@ then
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
 popd > /dev/null
-
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep apc
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep memcache
 
 echo "-----> Installing assets"
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
