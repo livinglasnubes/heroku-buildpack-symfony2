@@ -208,8 +208,7 @@ sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
 
 # Test for php.ini
 echo "-----> Ping php"
-if [ php -r "phpinfo();" | grep 'Configuration File' ] 
-then
+if php -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
         php -r "phpinfo();" | grep -i 'memcache'
