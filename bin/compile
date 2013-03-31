@@ -72,8 +72,8 @@ function install {
             if check_md5 $2
             then
                     echo "Bundling ${1} v${3}" | indent
-                    echo ${NGINX_URL} | indent
-                    download_url ${NGINX_URL}
+                    echo ${4} | indent
+                    download_url ${4}
             else
                     echo "Using cached ${1} v${3}" | indent
             fi
@@ -213,6 +213,7 @@ if php -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         cat ${PHP_INI_TEMP}
         ls ${PHP_TEMP_ROOT}/etc.d
+        ls ${PHP_TEMP_ROOT}/bin
         echo 'Is memcache here ?'
         LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}" php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
