@@ -211,8 +211,7 @@ if [ -f ${PHP_INI_TEMP} ]
 then
         # Debug info for php.ini
         echo "-----> Ping php"
-        php -v
-        php -r "phpinfo();" | grep 'Configuration File' | indent
+        php -v | grep 'Configuration File'
 
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?' | indent
