@@ -212,7 +212,8 @@ then
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
         
         # Check if apc & memcache[d] are here
-        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'memcache'
+        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'memcache' || echo "NO MEMCACHE"
+        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'apc' || echo "NO APC"
 
 	echo "-----> Composer install"
 	# do the deed!
