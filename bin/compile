@@ -161,6 +161,7 @@ echo "<?php phpinfo() ?>" > ${BUILD_DIR}/web/server/infos.php
 cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/php.ini
 cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/vendor/php/
 cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
+cp $LP_DIR/conf/fastcgi_params.erb ${BUILD_DIR}/vendor/nginx/conf/fastcgi_params.erb
 cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
@@ -265,10 +266,15 @@ if [ -d /app/conf ]; then
 		cp -f /app/conf/nginx.conf.erb /app/vendor/nginx/conf/nginx.conf.erb
 	fi
 
+	if [ -r /app/conf/fastcgi_params.erb ]; then
+		cp -f /app/conf/fastcgi_params.erb /app/vendor/nginx/conf/fastcgi_params
+	fi
+
 fi
 
 # Set correct port variable.
 erb /app/vendor/nginx/conf/nginx.conf.erb > /app/vendor/nginx/conf/nginx.conf
+erb /app/vendor/nginx/conf/fastcgi_params.erb > /app/vendor/nginx/conf/nginx.conf
 
 if [ -d /app/conf/nginx.d ]; then
 	# Parse .erb into .conf.
