@@ -276,7 +276,9 @@ fi
 
 # Set correct port variable.
 erb /app/vendor/nginx/conf/nginx.conf.erb > /app/vendor/nginx/conf/nginx.conf
-erb /app/vendor/nginx/conf/fastcgi_params.erb > /app/vendor/nginx/conf/nginx.conf
+if [ -r $LP_DIR/conf/fastcgi_params.erb ]; then
+    erb /app/vendor/nginx/conf/fastcgi_params.erb > /app/vendor/nginx/conf/fastcgi_params
+fi
 
 if [ -d /app/conf/nginx.d ]; then
 	# Parse .erb into .conf.
