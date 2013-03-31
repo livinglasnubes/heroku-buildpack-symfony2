@@ -206,7 +206,7 @@ export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_T
 sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_TEMP_ROOT}/php.ini
 
 
-if [ which php &> /dev/null ] 
+if [ -f ${PHP_TEMP_ROOT}/php.ini ] 
 then
         # Debug info for php.ini
         echo "-----> Ping php"
@@ -218,9 +218,6 @@ then
         php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?' | indent
         php -r "phpinfo();" | grep -i 'apc'
-else
-        echo "---------> there was an error checking if php command exists"
-        exit 1
 fi
 
 
