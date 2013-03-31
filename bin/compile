@@ -189,7 +189,7 @@ then
 	cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/bin	
 
 	# Deactivating plugins from php.ini (they won't be found)
-	sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/vendor/php/bin/php.ini
+	#sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/vendor/php/bin/php.ini
 
 
         # ini parameters file
