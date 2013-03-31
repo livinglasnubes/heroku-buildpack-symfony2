@@ -172,14 +172,14 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 # Php installation for bootstrap 
 
 # This is clearly a hack but it allows PHP to find its php.ini
-echo "---------> Adding a php.ini in ${BUILD_DIR}/app/${PHP_PATH} (hacky but needed)"
-if [ -f ${BUILD_DIR}/app/${PHP_PATH}/php.ini ]; then
-    echo "---------> A php.ini already exists in ${BUILD_DIR}/app/${PHP_PATH} so cannot apply the hack for our conf"
+echo "---------> Adding a php.ini in ${BUILD_DIR}/${PHP_PATH} (hacky but needed)"
+if [ -f ${BUILD_DIR}/${PHP_PATH}/php.ini ]; then
+    echo "---------> A php.ini already exists in ${BUILD_DIR}/${PHP_PATH} so cannot apply the hack for our conf"
     exit 1
 fi;
 
-if [ ! -d ${BUILD_DIR}/app/${PHP_PATH} ]; then
-    mkdir -p ${BUILD_DIR}/app/${PHP_PATH}
+if [ ! -d ${BUILD_DIR}/${PHP_PATH} ]; then
+    mkdir -p ${BUILD_DIR}/${PHP_PATH}
 fi
 
 cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/${PHP_PATH}/
