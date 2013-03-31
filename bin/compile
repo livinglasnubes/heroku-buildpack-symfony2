@@ -170,39 +170,40 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 
 # Php installation for bootstrap 
+PHP_TEMP_ROOT=${BUILD_DIR}/app/${PHP_PATH}
 
 # This is clearly a hack but it allows PHP to find its php.ini
-echo "---------> Adding a php.ini in ${BUILD_DIR}/${PHP_PATH} (hacky but needed)"
-if [ -f ${BUILD_DIR}/${PHP_PATH}/php.ini ]; then
-    echo "---------> A php.ini already exists in ${BUILD_DIR}/${PHP_PATH} so cannot apply the hack for our conf"
+echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
+if [ -f ${PHP_TEMP_ROOT}/php.ini ]; then
+    echo "---------> A php.ini already exists in ${PHP_TEMP_ROOT} so cannot apply the hack for our conf"
     exit 1
 fi;
 
-if [ ! -d ${BUILD_DIR}/${PHP_PATH} ]; then
-    mkdir -p ${BUILD_DIR}/${PHP_PATH}
+if [ ! -d ${PHP_TEMP_ROOT} ]; then
+    mkdir -p ${PHP_TEMP_ROOT}
 fi
 
-cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/${PHP_PATH}/
+cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
 
-if [ -d /app/conf/etc.d ]; then
-    cp -f /app/conf/etc.d/* ${BUILD_DIR}/app/${PHP_PATH}/etc.d/
+if [ -d $LP_DIR/conf/etc.d ]; then
+    cp -f $LP_DIR/conf/etc.d/* ${PHP_TEMP_ROOT}/etc.d/
 fi
 
 # Copying php.ini to php temporary installation
 # It solves datezone problem, possible others
-cp $LP_DIR/conf/php.ini ${BUILD_DIR}/${PHP_PATH}/bin	
-cp $LP_DIR/conf/php.ini ${BUILD_DIR}/app/${PHP_PATH}/php.ini
-#echo "extension_dir=${BUILD_DIR}/${PHP_PATH}/ext" >> /app/${PHP_PATH}/php.ini
+cp $LP_DIR/conf/php.ini ${PHP_TEMP_ROOT}/bin	
+cp $LP_DIR/conf/php.ini ${PHP_TEMP_ROOT}/php.ini
+#echo "extension_dir=${PHP_TEMP_ROOT}/ext" >> /app/${PHP_PATH}/php.ini
 #echo "extension=sundown.so" >> /app/$PHP_PATH/php.ini
 
 
 # We need this to use PHP in Sf2 task when building assets...
-export LD_LIBRARY_PATH=${BUILD_DIR}/${PHP_PATH}/icu/lib:${BUILD_DIR}/local/lib:${BUILD_DIR}/${PHP_PATH}/ext:${BUILD_DIR}/${PHP_PATH}/etc.d:${LD_LIBRARY_PATH}
-export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${BUILD_DIR}/${PHP_PATH}/bin:$PATH
+export LD_LIBRARY_PATH=${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}
+export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin:$PATH
 
 
 # Deactivating plugins from php.ini (they won't be found)
-sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/${PHP_PATH}/bin/php.ini
+sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_TEMP_ROOT}/php.ini
 
 
 if [ which php &> /dev/null ] 
