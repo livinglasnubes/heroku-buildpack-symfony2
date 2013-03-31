@@ -217,6 +217,8 @@ then
 fi
 popd > /dev/null
 
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep apc
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i|grep memcache
 
 echo "-----> Installing assets"
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
