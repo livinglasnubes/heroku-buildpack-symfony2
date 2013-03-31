@@ -214,9 +214,9 @@ then
         php -r "phpinfo();" | grep 'Configuration File'
 
         # Check if apc & memcache[d] are here
-        echo 'Is memcache here ?' | indent
+        echo 'Is memcache here ?'
         php -r "phpinfo();" | grep -i 'memcache'
-        echo 'Is apc here ?' | indent
+        echo 'Is apc here ?'
         php -r "phpinfo();" | grep -i 'apc'
 fi
 
