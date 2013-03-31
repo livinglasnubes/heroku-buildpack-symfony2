@@ -205,8 +205,10 @@ export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${BUILD
 sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/${PHP_PATH}/bin/php.ini
 
 
-echo "-----> Ping php"
-# Debug info for php.ini
+if [ which php &> /dev/null ] 
+then
+        # Debug info for php.ini
+        echo "-----> Ping php"
         php -v | indent
         php -r "phpinfo();" | grep 'Configuration File' | indent
 
@@ -215,7 +217,10 @@ echo "-----> Ping php"
         php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?' | indent
         php -r "phpinfo();" | grep -i 'apc'
-
+else
+        echo "---------> there was an error checking if php command exists"
+        exit 1
+fi
 
 
 # Composer Installation
