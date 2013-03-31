@@ -171,11 +171,12 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 # Php installation for bootstrap 
 PHP_TEMP_ROOT=${BUILD_DIR}/app/${PHP_PATH}
+PHP_INI_TEMP=${PHP_TEMP_ROOT}/bin/php.ini
 
 # This is clearly a hack but it allows PHP to find its php.ini
 echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
-if [ -f ${PHP_TEMP_ROOT}/php.ini ]; then
-    echo "---------> A php.ini already exists in ${PHP_TEMP_ROOT} so cannot apply the hack for our conf"
+if [ -f ${PHP_INI_TEMP} ]; then
+    echo "---------> A php.ini already exists in ${PHP_INI_TEMP} so cannot apply the hack for our conf"
     exit 1
 fi;
 
@@ -191,9 +192,8 @@ fi
 
 # Copying php.ini to php temporary installation
 # It solves datezone problem, possible others
-cp $LP_DIR/conf/php.ini ${PHP_TEMP_ROOT}/bin	
-cp $LP_DIR/conf/php.ini ${PHP_TEMP_ROOT}/php.ini
-#echo "extension_dir=${PHP_TEMP_ROOT}/ext" >> /app/${PHP_PATH}/php.ini
+cp $LP_DIR/conf/php.ini ${PHP_INI_TEMP}
+echo "extension_dir=${PHP_TEMP_ROOT}/etc.d" >> ${PHP_INI_TEMP}
 #echo "extension=sundown.so" >> /app/$PHP_PATH/php.ini
 
 
@@ -203,10 +203,10 @@ export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_T
 
 
 # Deactivating plugins from php.ini (they won't be found)
-sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_TEMP_ROOT}/php.ini
+sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
 
 
-if [ -f ${PHP_TEMP_ROOT}/php.ini ] 
+if [ -f ${PHP_INI_TEMP} ] 
 then
         # Debug info for php.ini
         echo "-----> Ping php"
