@@ -212,9 +212,9 @@ echo "-----> Ping php"
 if php -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
-        LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}" php -r "phpinfo();" | grep -i 'memcache'
+#        php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
-        php -r "phpinfo();" | grep -i 'apc'
+#        php -r "phpinfo();" | grep -i 'apc'
 else
     echo "---------> The php.ini is not found by php"
     exit 1
@@ -262,10 +262,10 @@ popd > /dev/null
 
 # Deploying assets - for some reason cd is neccesary
 cd ${BUILD_DIR}
-#echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
-php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
-#echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
+echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
+php ${BUILD_DIR}/app/console assets:install --symlink
+echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
+php ${BUILD_DIR}/app/console assetic:dump
 
 
 echo "-----> Installing boot script"
