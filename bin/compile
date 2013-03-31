@@ -205,17 +205,19 @@ export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_T
 # Deactivating plugins from php.ini (they won't be found)
 sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
 
-if [ -f ${PHP_INI_TEMP} ] 
-then
-        # Debug info for php.ini
-        echo "-----> Ping php"
-        php -r "phpinfo();" | grep 'Configuration File'
 
+# Test for php.ini
+echo "-----> Ping php"
+if [ php -r "phpinfo();" | grep 'Configuration File' ] 
+then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
         php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
         php -r "phpinfo();" | grep -i 'apc'
+else
+    echo "---------> The php.ini is not found by php"
+    exit 1
 fi
 
 
