@@ -38,6 +38,10 @@ NODE_URL="${S3_URL}/${NODE_FILE}"
 COMPOSER_URL="http://getcomposer.org/composer.phar"
 #
 
+#Paths
+PHP_PATH="vendor/php"
+NODE_PATH="vendor/node"
+
 function indent() {
 	c='s/^/       /'
 	case $(uname) in
@@ -127,7 +131,7 @@ install "libicu" $ICU_FILE $LIBICU_VERSION $ICU_URL ${BUILD_DIR}/local
 
 
 # PHP
-install "PHP" $PHP_FILE $PHP_VERSION $PHP_URL ${BUILD_DIR}/vendor/php
+install "PHP" $PHP_FILE $PHP_VERSION $PHP_URL ${BUILD_DIR}/${PHP_PATH}
 
 
 # newrelic
@@ -135,8 +139,8 @@ install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/
 
 
 # NODE
-install "Node" $NODE_FILE $NODE_VERSION $NODE_URL ${BUILD_DIR}/vendor/node
-        export PATH="$PATH:${BUILD_DIR}/vendor/node/bin"
+install "Node" $NODE_FILE $NODE_VERSION $NODE_URL ${BUILD_DIR}/${NODE_PATH}
+        export PATH="$PATH:${BUILD_DIR}/${NODE_PATH}/bin"
         node -v
 
 
@@ -145,8 +149,8 @@ echo "-----> Installing less"
 
 
 echo "-----> Hacking less & node path"
-        ln -s ${BUILD_DIR}/vendor/node/ /app/vendor/node
-        export INCLUDE_PATH="${BUILD_DIR}/vendor/node/include"
+        ln -s ${BUILD_DIR}/${NODE_PATH}/ /app/${NODE_PATH}
+        export INCLUDE_PATH="${BUILD_DIR}/${NODE_PATH}/include"
 
 
 popd > /dev/null
@@ -154,18 +158,64 @@ popd > /dev/null
 
 # Config files
 echo "-----> Copying config files"
-cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/vendor/php/etc/php-fpm.conf
+cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
 mkdir -p ${BUILD_DIR}/web/server
-cp ${BUILD_DIR}/vendor/php/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
-echo "<?php phpinfo() ?>" > ${BUILD_DIR}/web/server/infos.php
-cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/php.ini
-cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/vendor/php/
+cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
 cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
 if [ -r $LP_DIR/conf/fastcgi_params.erb ]; then
     cp $LP_DIR/conf/fastcgi_params.erb ${BUILD_DIR}/vendor/nginx/conf/fastcgi_params.erb
 fi
 cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
+
+
+# Php installation for bootstrap 
+
+# This is clearly a hack but it allows PHP to find its php.ini
+echo "---------> Adding a php.ini in ${BUILD_DIR}/app/${PHP_PATH} (hacky but needed)"
+if [ -f ${BUILD_DIR}/app/${PHP_PATH}/php.ini ]; then
+    echo "---------> A php.ini already exists in ${BUILD_DIR}/app/${PHP_PATH} so cannot apply the hack for our conf"
+    exit 1
+fi;
+
+if [ ! -d ${BUILD_DIR}/app/${PHP_PATH} ]; then
+    mkdir -p ${BUILD_DIR}/app/${PHP_PATH}
+fi
+
+cp -a $LP_DIR/conf/etc.d ${BUILD_DIR}/${PHP_PATH}/
+
+if [ -d /app/conf/etc.d ]; then
+    cp -f /app/conf/etc.d/* ${BUILD_DIR}/app/${PHP_PATH}/etc.d/
+fi
+
+# Copying php.ini to php temporary installation
+# It solves datezone problem, possible others
+cp $LP_DIR/conf/php.ini ${BUILD_DIR}/${PHP_PATH}/bin	
+cp $LP_DIR/conf/php.ini ${BUILD_DIR}/app/${PHP_PATH}/php.ini
+#echo "extension_dir=${BUILD_DIR}/${PHP_PATH}/ext" >> /app/${PHP_PATH}/php.ini
+#echo "extension=sundown.so" >> /app/$PHP_PATH/php.ini
+
+
+# We need this to use PHP in Sf2 task when building assets...
+export LD_LIBRARY_PATH=${BUILD_DIR}/${PHP_PATH}/icu/lib:${BUILD_DIR}/local/lib:${BUILD_DIR}/${PHP_PATH}/ext:${BUILD_DIR}/${PHP_PATH}/etc.d:${LD_LIBRARY_PATH}
+export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${BUILD_DIR}/${PHP_PATH}/bin:$PATH
+
+
+# Deactivating plugins from php.ini (they won't be found)
+sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/${PHP_PATH}/bin/php.ini
+
+
+echo "-----> Ping php"
+# Debug info for php.ini
+php -r "phpinfo();" | grep 'Configuration File' | indent
+
+# Check if apc & memcache[d] are here
+echo 'Is memcache here ?' | indent
+php -r "phpinfo();" | grep -i 'memcache'
+echo 'Is apc here ?' | indent
+php -r "phpinfo();" | grep -i 'apc'
+
+
 
 # Composer Installation
 pushd ${BUILD_DIR} > /dev/null
@@ -182,17 +232,7 @@ then
 		echo ${COMPOSER_URL} | indent
 		download_url ${COMPOSER_URL}
 	fi
-
-	# Copying php.ini to php temporary installation
-	# It solves datezone problem, possible others
-	cp $LP_DIR/conf/php.ini ${BUILD_DIR}/vendor/php/bin	
-
-	# Deactivating plugins from php.ini (they won't be found)
-	sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${BUILD_DIR}/vendor/php/bin/php.ini
         
-        #Adding extentions
-        echo "extension_dir=${BUILD_DIR}/vendor/php/etc.d/" >> ${BUILD_DIR}/vendor/php/bin/php.ini
-
         # ini parameters file
 	if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
             if [ -r ${BUILD_DIR}/app/config/parameters_prod.ini.erb ]; then
@@ -206,19 +246,11 @@ then
 			erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
             fi
 	fi
-        
-	echo "-----> Ping php"
-	# Debug info for php.ini
-	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
-        
-        # Check if apc & memcache[d] are here
-        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'memcache' || echo "NO MEMCACHE"
-        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'apc' || echo "NO APC"
 
 	echo "-----> Composer install"
 	# do the deed!
 	echo "Running: php composer.phar install --quiet --prefer-dist -n --no-progress -o" | indent
-	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
+	php composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
 
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
@@ -227,9 +259,9 @@ popd > /dev/null
 # Deploying assets - for some reason cd is neccesary
 cd ${BUILD_DIR}
 #echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
+php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
 #echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
+php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
 
 
 echo "-----> Installing boot script"
@@ -254,15 +286,15 @@ if [ -d /app/conf ]; then
 	mkdir -p /app/conf/nginx.d
 
 	if [ -d /app/conf/etc.d ]; then
-		cp -f /app/conf/etc.d/* /app/vendor/php/etc.d/
+		cp -f /app/conf/etc.d/* /app/${PHP_PATH}/etc.d/
 	fi
 
 	if [ -r /app/conf/php-fpm.conf ]; then
-		cp -f /app/conf/php-fpm.conf /app/vendor/php/etc/php-fpm.conf
+		cp -f /app/conf/php-fpm.conf /app/${PHP_PATH}/etc/php-fpm.conf
 	fi
 
 	if [ -r /app/conf/php.ini ]; then
-		cp -f /app/conf/php.ini /app/vendor/php/php.ini
+		cp -f /app/conf/php.ini /app/${PHP_PATH}/php.ini
 	fi
 
 	if [ -r /app/conf/nginx.conf.erb ]; then
@@ -300,20 +332,20 @@ fi
 
 # Preserve current php-fpm.conf so that env list does
 # not go out of hand across restarts.
-if [ -r /app/vendor/php/etc/php-fpm.conf.current ]; then
-	cp -f /app/vendor/php/etc/php-fpm.conf.current /app/vendor/php/etc/php-fpm.conf
+if [ -r /app/${PHP_PATH}/etc/php-fpm.conf.current ]; then
+	cp -f /app/${PHP_PATH}/etc/php-fpm.conf.current /app/${PHP_PATH}/etc/php-fpm.conf
 else
-	cp -f /app/vendor/php/etc/php-fpm.conf /app/vendor/php/etc/php-fpm.conf.current
+	cp -f /app/${PHP_PATH}/etc/php-fpm.conf /app/${PHP_PATH}/etc/php-fpm.conf.current
 fi
 
 # Expose Heroku config vars to PHP-FPM processes
 for var in \`env | cut -f1 -d=\`; do
-	echo "env[\$var] = \\$\${var}" >> /app/vendor/php/etc/php-fpm.conf
+	echo "env[\$var] = \\$\${var}" >> /app/${PHP_PATH}/etc/php-fpm.conf
 done
 
-touch /app/vendor/nginx/logs/access.log /app/vendor/nginx/logs/error.log /app/vendor/php/var/log/php-fpm.log /app/vendor/php/var/log/php-errors.log /app/local/var/log/newrelic/newrelic-daemon.log /app/local/var/log/newrelic/php_agent.log
+touch /app/vendor/nginx/logs/access.log /app/vendor/nginx/logs/error.log /app/${PHP_PATH}/var/log/php-fpm.log /app/${PHP_PATH}/var/log/php-errors.log /app/local/var/log/newrelic/newrelic-daemon.log /app/local/var/log/newrelic/php_agent.log
 mkdir -p client_body_temp fastcgi_temp proxy_temp scgi_temp uwsgi_temp
-(tail -f -n 0 /app/vendor/nginx/logs/*.log /app/vendor/php/var/log/*.log /app/local/var/log/newrelic/*.log &)
+(tail -f -n 0 /app/vendor/nginx/logs/*.log /app/${PHP_PATH}/var/log/*.log /app/local/var/log/newrelic/*.log &)
 
 echo "-----> Installing assets"
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
@@ -323,7 +355,7 @@ export SF_ENV="prod"
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 	/app/local/bin/newrelic-daemon -c /app/local/etc/newrelic.cfg -d error
 fi
-/app/vendor/php/sbin/php-fpm
+/app/${PHP_PATH}/sbin/php-fpm
 /app/vendor/nginx/sbin/nginx
 
 EOF
