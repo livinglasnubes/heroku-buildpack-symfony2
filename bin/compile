@@ -167,10 +167,6 @@ fi
 cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
-echo "-----> Checking deps"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i | grep apc
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i | grep memcache
-
 # Composer Installation
 pushd ${BUILD_DIR} > /dev/null
 
@@ -208,13 +204,19 @@ then
 			erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
             fi
 	fi
-
+        
+	echo "-----> Ping php"
 	# Debug info for php.ini
 	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep 'Configuration File'
+        
+        # Check if apc & memcache[d] are here
+        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i | grep apc
+        LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php -i | grep memcache
 
+	echo "-----> Composer install"
 	# do the deed!
 	echo "Running: php composer.phar install --quiet --prefer-dist -n --no-progress -o" | indent
-	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install --prefer-dist -n | indent
+	LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
 
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
