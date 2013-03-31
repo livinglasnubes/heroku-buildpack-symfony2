@@ -223,19 +223,6 @@ then
 fi
 popd > /dev/null
 
-echo "-----> Installing assets"
-# Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
-export SF_DEBUG="--no-debug"
-export SF_ENV="prod"
-
-# Deploying assets - for some reason cd is neccesary
-cd ${BUILD_DIR}
-#echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
-#echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
-
-
 echo "-----> Installing boot script"
 cd $BUILD_DIR
 cat >>boot.sh <<EOF
@@ -318,6 +305,18 @@ done
 touch /app/vendor/nginx/logs/access.log /app/vendor/nginx/logs/error.log /app/vendor/php/var/log/php-fpm.log /app/vendor/php/var/log/php-errors.log /app/local/var/log/newrelic/newrelic-daemon.log /app/local/var/log/newrelic/php_agent.log
 mkdir -p client_body_temp fastcgi_temp proxy_temp scgi_temp uwsgi_temp
 (tail -f -n 0 /app/vendor/nginx/logs/*.log /app/vendor/php/var/log/*.log /app/local/var/log/newrelic/*.log &)
+
+echo "-----> Installing assets"
+# Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
+export SF_DEBUG="--no-debug"
+export SF_ENV="prod"
+
+# Deploying assets - for some reason cd is neccesary
+cd ${BUILD_DIR}
+#echo "-------> Running: app/console assets:install --symlink  --env=${SF_ENV}"
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assets:install --symlink --env=${SF_ENV}
+#echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
+LD_LIBRARY_PATH="${BUILD_DIR}/local/lib" ${BUILD_DIR}/vendor/php/bin/php ${BUILD_DIR}/app/console assetic:dump --env=${SF_ENV}
 
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 	/app/local/bin/newrelic-daemon -c /app/local/etc/newrelic.cfg -d error
