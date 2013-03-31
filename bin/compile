@@ -170,7 +170,7 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 
 # Php installation for bootstrap 
-PHP_TEMP_ROOT=/app/${PHP_PATH}
+PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
 PHP_INI_TEMP=${PHP_TEMP_ROOT}/bin/php.ini
 
 # This is clearly a hack but it allows PHP to find its php.ini
@@ -211,7 +211,7 @@ if [ -f ${PHP_INI_TEMP} ]
 then
         # Debug info for php.ini
         echo "-----> Ping php"
-        php -v | indent
+        php -v
         php -r "phpinfo();" | grep 'Configuration File' | indent
 
         # Check if apc & memcache[d] are here
