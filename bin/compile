@@ -199,8 +199,8 @@ echo "extension_dir=${PHP_TEMP_ROOT}/ext" >> ${PHP_INI_TEMP}
 
 
 # We need this to use PHP in Sf2 task when building assets...
-export LD_LIBRARY_PATH=${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}
-export PATH=${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH
+export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}"
+export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
 
 
 # Deactivating plugins from php.ini (they won't be found)
@@ -212,7 +212,7 @@ echo "-----> Ping php"
 if php -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
-        export LD_LIBRARY_PATH=${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH} ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'memcache'
+        export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}" ${BUILD_DIR}/vendor/php/bin/php -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
         php -r "phpinfo();" | grep -i 'apc'
 else
