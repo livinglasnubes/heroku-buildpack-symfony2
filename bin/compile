@@ -216,9 +216,11 @@ echo "-----> Ping php"
 if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
-        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache'
+        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache support'
+        echo 'Is memcached here ?'
+        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcached support'
         echo 'Is apc here ?'
-        ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc'
+        ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc.enable_cli'
 else
     echo "---------> The php.ini is not found by php"
     exit 1
