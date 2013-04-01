@@ -63,7 +63,7 @@ function download_url() {
 	curl -s -S -O -L -m 300 --connect-timeout 60 "$TARGET_URL"
 }
 
-# package params: name file version url target
+# package params: name tarball version url build_dir target
 function install {
     echo "-----> Installing ${1} v${3}"
     if [ -f $2 ]
@@ -170,7 +170,7 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 
 # Php installation for bootstrap 
-PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
+PHP_TEMP_ROOT=/app/${PHP_PATH}
 PHP_INI_TEMP=${PHP_TEMP_ROOT}/bin/php.ini
 
 # This is clearly a hack but it allows PHP to find its php.ini
@@ -193,18 +193,18 @@ fi
 # Copying php.ini to php temporary installation
 # It solves datezone problem, possible others
 cp $LP_DIR/conf/php.ini ${PHP_INI_TEMP}
-echo "extension_dir=${PHP_TEMP_ROOT}/etc.d" >> ${PHP_INI_TEMP}
-echo "extension_dir=${PHP_TEMP_ROOT}/ext" >> ${PHP_INI_TEMP}
-#echo "extension=sundown.so" >> ${PHP_INI_TEMP}
-
-
-# We need this to use PHP in Sf2 task when building assets...
-export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${PHP_TEMP_ROOT}/etc.d:${LD_LIBRARY_PATH}"
-export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
-
 
 # Deactivating plugins from php.ini (they won't be found)
 sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
+
+# We need this to use PHP in Sf2 task when building assets...
+export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${LD_LIBRARY_PATH}"
+export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
+
+
+#Still need apc for the moment
+echo "extension_dir=${BUILD_DIR}/local/lib" >> ${PHP_INI_TEMP}
+echo "extension=apc.so" >> ${PHP_INI_TEMP}
 
 
 # Test for php.ini
