@@ -172,9 +172,8 @@ popd $PUSHD_DEBUG
 
     echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
-    mkdir -p ${BUILD_DIR}/web/server
-    cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
-    echo "<?php phpinfo(); ?>" > ${BUILD_DIR}/web/server/info.php
+    cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/status.html
+    echo "<?php phpinfo(); ?>" > ${BUILD_DIR}/web/info.php
     cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
     if [ -r $LP_DIR/conf/fastcgi_params.erb ]; then
         cp $LP_DIR/conf/fastcgi_params.erb ${BUILD_DIR}/vendor/nginx/conf/fastcgi_params.erb
