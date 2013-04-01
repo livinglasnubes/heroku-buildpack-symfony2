@@ -42,6 +42,22 @@ COMPOSER_URL="http://getcomposer.org/composer.phar"
 PHP_PATH="vendor/php"
 NODE_PATH="vendor/node"
 
+#say where you go
+PUSHD_DEBUG="> /dev/null"
+
+# Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
+export SF_DEBUG="--no-debug"
+export SF_ENV="prod"
+
+
+#More variables
+BIN_DIR=$(dirname $0)
+BUILD_DIR=$1
+CACHE_DIR=$2
+BUNDLE_DIR="${CACHE_DIR}/bundles"
+LP_DIR=`cd $(dirname $0); cd ..; pwd`
+export COMPOSER_HOME="${CACHE_DIR}/.composer"
+
 function indent() {
 	c='s/^/       /'
 	case $(uname) in
@@ -92,186 +108,192 @@ function install {
 }
 
 
-BIN_DIR=$(dirname $0)
-BUILD_DIR=$1
-CACHE_DIR=$2
-BUNDLE_DIR="${CACHE_DIR}/bundles"
-LP_DIR=`cd $(dirname $0); cd ..; pwd`
-export COMPOSER_HOME="${CACHE_DIR}/.composer"
-
 # include .files when moving things around
 shopt -s dotglob
 
 mkdir -p $BUILD_DIR $CACHE_DIR ${BUNDLE_DIR} ${BUILD_DIR}/local ${BUILD_DIR}/vendor/bin ${COMPOSER_HOME} ${BUILD_DIR}/.profile.d
 
-pushd ${BUNDLE_DIR} > /dev/null
+pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
 
-if [ -n "`find . -type f -atime +30`" ]
-then
-	echo "-----> Pruning Unused Cached Bundles"
-	find . -type f -atime +30 -delete | indent
-fi
+    if [ -n "`find . -type f -atime +30`" ]
+    then
+            echo "-----> Pruning Unused Cached Bundles"
+            find . -type f -atime +30 -delete | indent
+    fi
 
-echo "-----> Fetching Manifest"
-echo ${MANIFEST_URL} | indent
-download_url ${MANIFEST_URL}
-
-
-# Nginx name file version url target
-install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
-
-# libmemcached
-install "libmemcached" $MEMCACHED_FILE $LIBMEMCACHED_VERSION $MEMCACHED_URL ${BUILD_DIR}/local
-
-# libmcrypt
-install "libmcrypt" $MCRYPT_FILE $LIBMCRYPT_VERSION $MCRYPT_URL ${BUILD_DIR}/local
-
-# libicu
-install "libicu" $ICU_FILE $LIBICU_VERSION $ICU_URL ${BUILD_DIR}/local
+    echo "-----> Fetching Manifest"
+    echo ${MANIFEST_URL} | indent
+    download_url ${MANIFEST_URL}
 
 
-# PHP
-install "PHP" $PHP_FILE $PHP_VERSION $PHP_URL ${BUILD_DIR}/${PHP_PATH}
+    # Nginx name file version url target
+    install "Nginx" $NGINX_FILE $NGINX_VERSION $NGINX_URL ${BUILD_DIR}/vendor/nginx
+
+    # libmemcached
+    install "libmemcached" $MEMCACHED_FILE $LIBMEMCACHED_VERSION $MEMCACHED_URL ${BUILD_DIR}/local
+
+    # libmcrypt
+    install "libmcrypt" $MCRYPT_FILE $LIBMCRYPT_VERSION $MCRYPT_URL ${BUILD_DIR}/local
+
+    # libicu
+    install "libicu" $ICU_FILE $LIBICU_VERSION $ICU_URL ${BUILD_DIR}/local
 
 
-# newrelic
-install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/local
+    # PHP
+    install "PHP" $PHP_FILE $PHP_VERSION $PHP_URL ${BUILD_DIR}/${PHP_PATH}
 
 
-# NODE
-install "Node" $NODE_FILE $NODE_VERSION $NODE_URL ${BUILD_DIR}/${NODE_PATH}
-        export PATH="$PATH:${BUILD_DIR}/${NODE_PATH}/bin"
-        node -v
+    # newrelic
+    install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/local
 
 
-echo "-----> Installing less"
-        npm install -g less
+    # NODE
+    install "Node" $NODE_FILE $NODE_VERSION $NODE_URL ${BUILD_DIR}/${NODE_PATH}
+            export PATH="$PATH:${BUILD_DIR}/${NODE_PATH}/bin"
+            node -v
 
 
-echo "-----> Hacking less & node path"
-        ln -s ${BUILD_DIR}/${NODE_PATH}/ /app/${NODE_PATH}
-        export INCLUDE_PATH="${BUILD_DIR}/${NODE_PATH}/include"
+    echo "-----> Installing less"
+            npm install -g less
 
 
-popd > /dev/null
+    echo "-----> Hacking less & node path"
+            ln -s ${BUILD_DIR}/${NODE_PATH}/ /app/${NODE_PATH}
+            export INCLUDE_PATH="${BUILD_DIR}/${NODE_PATH}/include"
 
-
-# Config files
-echo "-----> Copying config files"
-cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
-mkdir -p ${BUILD_DIR}/web/server
-cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
-cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
-if [ -r $LP_DIR/conf/fastcgi_params.erb ]; then
-    cp $LP_DIR/conf/fastcgi_params.erb ${BUILD_DIR}/vendor/nginx/conf/fastcgi_params.erb
-fi
-cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
-cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
-
-
-# Php installation for bootstrap
-PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
-PHP_INI_TEMP=/app/${PHP_PATH}/php.ini
-EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
-
-# This is clearly a hack but it allows PHP to find its php.ini
-echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
-if [ -f ${PHP_INI_TEMP} ]; then
-    echo "---------> A php.ini already exists in ${PHP_INI_TEMP} so cannot apply the hack for our conf"
-    exit 1
-fi;
-
-mkdir -p /app/${PHP_PATH}/
-mkdir -p ${PHP_TEMP_ROOT}
-
-cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
-
-if [ -d $LP_DIR/conf/etc.d ]; then
-    cp -f $LP_DIR/conf/etc.d/* ${PHP_TEMP_ROOT}/etc.d/
-fi
-
-# Copying php.ini to php temporary installation
-# It solves datezone problem, possible others
-cp $LP_DIR/conf/php.ini ${PHP_INI_TEMP}
-
-cat ${PHP_INI_TEMP}|grep date.timezone
-
-# Deactivating plugins from php.ini (they won't be found)
-sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
-
-# We need this to use PHP in Sf2 task when building assets...
-export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${LD_LIBRARY_PATH}"
-export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
-
-
-ls -lR ${BUILD_DIR}/local/lib
-#Still need apc for the moment
-echo "extension_dir=${PHP_TEMP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI_TEMP}
-echo "extension=apc.so" >> ${PHP_INI_TEMP}
-echo "extension=memcache.so" >> ${PHP_INI_TEMP}
-echo "extension=memcached.so" >> ${PHP_INI_TEMP}
-
-# Test for php.ini
-echo "-----> Ping php"
-if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
-        # Check if apc & memcache[d] are here
-        echo 'Is memcache here ?'
-        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache support'
-        echo 'Is memcached here ?'
-        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcached support'
-        echo 'Is apc here ?'
-        ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc.enable_cli'
-else
-    echo "---------> The php.ini is not found by php"
-    exit 1
-fi
-
-
-# Composer Installation
-pushd ${BUILD_DIR} > /dev/null
-
-if [ -f "composer.json" ]
-then
-	echo "-----> Installing dependencies using Composer"
-	GIT_DIR_ORIG=${GIT_DIR}
-	unset GIT_DIR
-
-	if [ ! -f "composer.phar" ]
-	then
-		echo "Fetching composer.phar" | indent
-		echo ${COMPOSER_URL} | indent
-		download_url ${COMPOSER_URL}
-	fi
         
-        # ini parameters file
-	if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
-            if [ -r ${BUILD_DIR}/app/config/parameters_prod.ini.erb ]; then
-			erb ${BUILD_DIR}/app/config/parameters_prod.ini.erb > ${BUILD_DIR}/app/config/parameters.ini
+popd $PUSHD_DEBUG
+
+# ---------------------------------------- Copying config files --------------------------------------
+    # Php installation for bootstrap
+    PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
+    PHP_INI=/app/${PHP_PATH}/php.ini
+    EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
+
+    echo "-----> Copying config files"
+    cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
+    mkdir -p ${BUILD_DIR}/web/server
+    cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/server/status.html
+    cp $LP_DIR/conf/nginx.conf.erb ${BUILD_DIR}/vendor/nginx/conf/nginx.conf.erb
+    if [ -r $LP_DIR/conf/fastcgi_params.erb ]; then
+        cp $LP_DIR/conf/fastcgi_params.erb ${BUILD_DIR}/vendor/nginx/conf/fastcgi_params.erb
+    fi
+    cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
+    cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
+
+    cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
+
+    if [ -d $LP_DIR/conf/etc.d ]; then
+        cp -f $LP_DIR/conf/etc.d/* ${PHP_TEMP_ROOT}/etc.d/
+    fi
+
+# -------------------------- Hacking config files to get apc & memcached in cli ------------------------------
+
+
+    # This is clearly a hack but it allows PHP to find its php.ini
+    echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
+    if [ -f ${PHP_INI} ]; then
+        echo "---------> A php.ini already exists in ${PHP_INI} so cannot apply the hack for our conf"
+        exit 1
+    fi;
+
+    mkdir -p /app/${PHP_PATH}/
+    mkdir -p ${PHP_TEMP_ROOT}
+
+    # Copying php.ini to php temporary installation
+    # It solves datezone problem, possible others
+    cp $LP_DIR/conf/php.ini ${PHP_INI}
+
+    cat ${PHP_INI}|grep date.timezone
+
+    # Deactivating plugins from php.ini (they won't be found)
+    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
+
+    # We need this to use PHP & APC or another caching system in Sf2 task when building assets...
+    export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${LD_LIBRARY_PATH}"
+    export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
+
+
+    echo "extension_dir=${PHP_TEMP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI}
+    echo "extension=apc.so" >> ${PHP_INI}
+    echo "extension=memcache.so" >> ${PHP_INI}
+    echo "extension=memcached.so" >> ${PHP_INI}
+
+    # Test for php.ini
+    echo "-----> Ping php"
+    if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
+            # Check if apc & memcache[d] are here
+            echo 'Is memcache here ?'
+            ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache support'
+            echo 'Is memcached here ?'
+            ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcached support'
+            echo 'Is apc here ?'
+            ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc.enable_cli'
+    else
+        echo "---------> The php.ini was not found"
+        exit 1
+    fi
+
+# ------------------------------- Composer Installation -----------------------------------
+
+pushd ${BUILD_DIR}
+
+    if [ -f "composer.json" ]
+    then
+            echo "-----> Installing dependencies using Composer"
+            GIT_DIR_ORIG=${GIT_DIR}
+            unset GIT_DIR
+
+            if [ ! -f "composer.phar" ]
+            then
+                    echo "Fetching composer.phar" | indent
+                    echo ${COMPOSER_URL} | indent
+                    download_url ${COMPOSER_URL}
             fi
-	fi
 
-        # yml parameters file
-	if [ ! -r ${BUILD_DIR}/app/config/parameters.yml ]; then
-            if [ -r ${BUILD_DIR}/app/config/parameters_prod.yml.erb ]; then
-			erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
+            # ini parameters file
+            if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
+                if [ -r ${BUILD_DIR}/app/config/parameters_prod.ini.erb ]; then
+                            erb ${BUILD_DIR}/app/config/parameters_prod.ini.erb > ${BUILD_DIR}/app/config/parameters.ini
+                fi
             fi
-	fi
 
-	echo "-----> Composer install"
-	# do the deed!
-	echo "Running: php composer.phar install --quiet --prefer-dist -n --no-progress -o" | indent
-	${EXEC_PHP} composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
+            # yml parameters file
+            if [ ! -r ${BUILD_DIR}/app/config/parameters.yml ]; then
+                if [ -r ${BUILD_DIR}/app/config/parameters_prod.yml.erb ]; then
+                            erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
+                fi
+            fi
 
-	export GIT_DIR=${GIT_DIR_ORIG}
-fi
-popd > /dev/null
+            echo "-----> Composer install"
+            # do the deed!
+            echo "Running: php composer.phar install --prefer-dist -n --no-progress -o" | indent
+            ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress -o | indent
 
-# Deploying assets - for some reason cd is neccesary
-cd ${BUILD_DIR}
-echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
-${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
-echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
+            export GIT_DIR=${GIT_DIR_ORIG}
+    fi
+
+popd ${PUSHD_DEBUG}
+
+# ------------------------------- Deploying assets based on hack conf -----------------------------------
+
+    #  - for some reason cd is neccesary
+    pushd ${BUILD_DIR} ${PUSHD_DEBUG}
+    echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
+    ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
+    echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
+    ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
+
+popd ${PUSHD_DEBUG}
+
+# ----------------------------------------- Cleanup hacks -----------------------------------------------
+    echo "-----> Cleanup hacks"
+    cp $LP_DIR/conf/php.ini ${PHP_INI}
+
+    cat ${PHP_INI}|grep date.timezone
+
+    # Deactivating plugins from php.ini (they won't be found)
+    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
 
 
 echo "-----> Installing boot script"
@@ -358,9 +380,7 @@ mkdir -p client_body_temp fastcgi_temp proxy_temp scgi_temp uwsgi_temp
 (tail -f -n 0 /app/vendor/nginx/logs/*.log /app/${PHP_PATH}/var/log/*.log /app/local/var/log/newrelic/*.log &)
 
 echo "-----> Installing assets"
-# Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
-export SF_DEBUG="--no-debug"
-export SF_ENV="prod"
+
 
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 	/app/local/bin/newrelic-daemon -c /app/local/etc/newrelic.cfg -d error
