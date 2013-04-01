@@ -206,7 +206,7 @@ export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_
 
 ls -lR ${BUILD_DIR}/local/lib
 #Still need apc for the moment
-echo "extension_dir=${BUILD_DIR}/local/lib" >> ${PHP_INI_TEMP}
+echo "extension_dir=${PHP_TEMP_ROOT}/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI_TEMP}
 echo "extension=apc.so" >> ${PHP_INI_TEMP}
 echo "extension=memcache.so" >> ${PHP_INI_TEMP}
 echo "extension=memcached.so" >> ${PHP_INI_TEMP}
