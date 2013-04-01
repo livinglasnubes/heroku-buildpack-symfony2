@@ -388,6 +388,7 @@ fi
 echo "Warming up Cache..."
 
 cd /app/
+rm -rf app/cache/*
 php app/console cache:warmup -e prod
 
 /app/${PHP_PATH}/sbin/php-fpm
