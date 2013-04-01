@@ -168,9 +168,10 @@ popd $PUSHD_DEBUG
 
 # ---------------------------------------- Copying config files --------------------------------------
     # Php installation for bootstrap
-    PHP_TEMP_ROOT=/app/${PHP_PATH}
-    PHP_INI=/app/${PHP_PATH}/php.ini
-    EXEC_PHP=/app/${PHP_PATH}/bin/php
+    PHP_ROOT=/${BUILD_DIR}/${PHP_PATH}
+    PHP_INI=${PHP_ROOT}/php.ini
+    EXEC_PHP=${PHP_ROOT}/bin/php
+    PHP_TEMP_ROOT=/app/${PHP_PATH} # temporary php route used for hack 
 
     echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
@@ -183,24 +184,24 @@ popd $PUSHD_DEBUG
     cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
     cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
-    cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
+    cp -a $LP_DIR/conf/etc.d ${PHP_ROOT}/
 
     if [ -d $LP_DIR/conf/etc.d ]; then
-        cp -f $LP_DIR/conf/etc.d/* ${PHP_TEMP_ROOT}/etc.d/
+        cp -f $LP_DIR/conf/etc.d/* ${PHP_ROOT}/etc.d/
     fi
 
 # -------------------------- Hacking config files to get apc & memcached in cli ------------------------------
 
 
     # This is clearly a hack but it allows PHP to find its php.ini
-    echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
+    echo "---------> Adding a php.ini in ${PHP_ROOT} (hacky but needed)"
     if [ -f ${PHP_INI} ]; then
         echo "---------> A php.ini already exists in ${PHP_INI} so cannot apply the hack for our conf"
         exit 1
     fi;
 
     mkdir -p /app/${PHP_PATH}/
-    mkdir -p ${PHP_TEMP_ROOT}
+    mkdir -p ${PHP_ROOT}
 
     # Copying php.ini to php temporary installation
     # It solves datezone problem, possible others
