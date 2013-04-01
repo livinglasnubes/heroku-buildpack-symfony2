@@ -181,7 +181,7 @@ if [ -f ${PHP_INI_TEMP} ]; then
 fi;
 
 if [ ! -d ${PHP_TEMP_ROOT} ]; then
-    mkdir -p ${PHP_TEMP_ROOT}
+    mkdir -p ${PHP_TEMP_ROOT}/bin
 fi
 
 cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
