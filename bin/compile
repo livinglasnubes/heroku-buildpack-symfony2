@@ -115,8 +115,6 @@ mkdir -p $BUILD_DIR $CACHE_DIR ${BUNDLE_DIR} ${BUILD_DIR}/local ${BUILD_DIR}/ven
 
 pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
 
-# ---------------------------------------- Install vendors  --------------------------------------
-
     if [ -n "`find . -type f -atime +30`" ]
     then
             echo "-----> Pruning Unused Cached Bundles"
@@ -168,9 +166,9 @@ popd $PUSHD_DEBUG
 
 # ---------------------------------------- Copying config files --------------------------------------
     # Php installation for bootstrap
-    PHP_ROOT=/${BUILD_DIR}/${PHP_PATH}
-    PHP_INI=${PHP_ROOT}/php.ini
-    EXEC_PHP=${PHP_ROOT}/bin/php
+    PHP_ROOT=${BUILD_DIR}/${PHP_PATH}
+    PHP_INI=/app/${PHP_PATH}/php.ini
+    EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
 
     echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
@@ -279,6 +277,7 @@ popd ${PUSHD_DEBUG}
 
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
+#  - for some reason cd is neccesary
 pushd ${BUILD_DIR} ${PUSHD_DEBUG}
 
     echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
@@ -387,6 +386,11 @@ if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 fi
 /app/${PHP_PATH}/sbin/php-fpm
 /app/vendor/nginx/sbin/nginx
+
+echo "Warming up Cache..."
+
+cd /app/
+php app/console cache:warmup -e prod
 
 EOF
 chmod +x boot.sh
