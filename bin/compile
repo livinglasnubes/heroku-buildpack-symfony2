@@ -168,7 +168,7 @@ popd $PUSHD_DEBUG
     # Php installation for bootstrap
     PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
     PHP_INI=/app/${PHP_PATH}/php.ini
-    EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
+    EXEC_PHP=/app/${PHP_PATH}/bin/php
 
     echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
