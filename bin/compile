@@ -169,9 +169,10 @@ cp $LP_DIR/conf/mime.types ${BUILD_DIR}/vendor/nginx/conf/mime.types
 cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 
-# Php installation for bootstrap 
+# Php installation for bootstrap
 PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
 PHP_INI_TEMP=${PHP_TEMP_ROOT}/php.ini
+EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
 
 # This is clearly a hack but it allows PHP to find its php.ini
 echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
@@ -211,12 +212,12 @@ echo "extension=apc.so" >> ${PHP_INI_TEMP}
 
 # Test for php.ini
 echo "-----> Ping php"
-if php -r "phpinfo();" | grep 'Configuration File'; then
+if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
         # Check if apc & memcache[d] are here
         echo 'Is memcache here ?'
-        php -r "phpinfo();" | grep -i 'memcache'
+        ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache'
         echo 'Is apc here ?'
-        php -r "phpinfo();" | grep -i 'apc'
+        ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc'
 else
     echo "---------> The php.ini is not found by php"
     exit 1
@@ -256,7 +257,7 @@ then
 	echo "-----> Composer install"
 	# do the deed!
 	echo "Running: php composer.phar install --quiet --prefer-dist -n --no-progress -o" | indent
-	php composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
+	${EXEC_PHP} composer.phar install --quiet --prefer-dist -n --no-progress -o | indent
 
 	export GIT_DIR=${GIT_DIR_ORIG}
 fi
@@ -265,9 +266,9 @@ popd > /dev/null
 # Deploying assets - for some reason cd is neccesary
 cd ${BUILD_DIR}
 echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
-php app/console assets:install --symlink  --env=${SF_ENV}
+${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
 echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-php app/console assetic:dump --env=${SF_ENV}
+${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
 
 
 echo "-----> Installing boot script"
