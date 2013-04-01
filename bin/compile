@@ -280,7 +280,7 @@ popd ${PUSHD_DEBUG}
 #  - for some reason cd is neccesary
 pushd ${BUILD_DIR} ${PUSHD_DEBUG}
 
-    echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
+    echo "-------> Running: app/console assets:install --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
     ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
