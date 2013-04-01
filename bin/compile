@@ -208,7 +208,8 @@ ls -lR ${BUILD_DIR}/local/lib
 #Still need apc for the moment
 echo "extension_dir=${BUILD_DIR}/local/lib" >> ${PHP_INI_TEMP}
 echo "extension=apc.so" >> ${PHP_INI_TEMP}
-
+echo "extension=memcache.so" >> ${PHP_INI_TEMP}
+echo "extension=memcached.so" >> ${PHP_INI_TEMP}
 
 # Test for php.ini
 echo "-----> Ping php"
