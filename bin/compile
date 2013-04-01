@@ -277,14 +277,16 @@ popd ${PUSHD_DEBUG}
 
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
-    #  - for some reason cd is neccesary
-    pushd ${BUILD_DIR} ${PUSHD_DEBUG}
+mv ${BUILD_DIR} /app
+pushd /app ${PUSHD_DEBUG}
+
     echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
     ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
 
 popd ${PUSHD_DEBUG}
+mv /app ${BUILD_DIR}
 
 # ----------------------------------------- Cleanup hacks -----------------------------------------------
     echo "-----> Cleanup hacks"
@@ -378,8 +380,6 @@ done
 touch /app/vendor/nginx/logs/access.log /app/vendor/nginx/logs/error.log /app/${PHP_PATH}/var/log/php-fpm.log /app/${PHP_PATH}/var/log/php-errors.log /app/local/var/log/newrelic/newrelic-daemon.log /app/local/var/log/newrelic/php_agent.log
 mkdir -p client_body_temp fastcgi_temp proxy_temp scgi_temp uwsgi_temp
 (tail -f -n 0 /app/vendor/nginx/logs/*.log /app/${PHP_PATH}/var/log/*.log /app/local/var/log/newrelic/*.log &)
-
-echo "-----> Installing assets"
 
 
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
