@@ -181,9 +181,8 @@ if [ -f ${PHP_INI_TEMP} ]; then
     exit 1
 fi;
 
-if [ ! -d ${PHP_TEMP_ROOT} ]; then
-    mkdir -p ${PHP_TEMP_ROOT}
-fi
+mkdir -p /app/${PHP_PATH}/
+mkdir -p ${PHP_TEMP_ROOT}
 
 cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
 
