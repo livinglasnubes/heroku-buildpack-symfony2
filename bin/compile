@@ -171,7 +171,6 @@ popd $PUSHD_DEBUG
     PHP_ROOT=/${BUILD_DIR}/${PHP_PATH}
     PHP_INI=${PHP_ROOT}/php.ini
     EXEC_PHP=${PHP_ROOT}/bin/php
-    PHP_TEMP_ROOT=/app/${PHP_PATH} # temporary php route used for hack 
 
     echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
@@ -213,11 +212,11 @@ popd $PUSHD_DEBUG
     sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
 
     # We need this to use PHP & APC or another caching system in Sf2 task when building assets...
-    export LD_LIBRARY_PATH="${PHP_TEMP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_TEMP_ROOT}/ext:${LD_LIBRARY_PATH}"
-    export PATH="${BUILD_DIR}/${NODE_PATH}/bin:${BUILD_DIR}/node_modules/.bin:${PHP_TEMP_ROOT}/bin/:$PATH"
+    export LD_LIBRARY_PATH="${PHP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_ROOT}/ext:${LD_LIBRARY_PATH}"
+    export PATH="${PHP_ROOT}/bin/:$PATH"
 
 
-    echo "extension_dir=${PHP_TEMP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI}
+    echo "extension_dir=${PHP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI}
     echo "extension=apc.so" >> ${PHP_INI}
     echo "extension=memcache.so" >> ${PHP_INI}
     echo "extension=memcached.so" >> ${PHP_INI}
@@ -280,8 +279,7 @@ popd ${PUSHD_DEBUG}
 
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
-mv ${BUILD_DIR} /app
-pushd /app ${PUSHD_DEBUG}
+pushd ${BUILD_DIR} ${PUSHD_DEBUG}
 
     echo "-------> Running: app/console assets:install --symlink --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
@@ -289,7 +287,6 @@ pushd /app ${PUSHD_DEBUG}
     ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
 
 popd ${PUSHD_DEBUG}
-mv /app ${BUILD_DIR}
 
 # ----------------------------------------- Cleanup hacks -----------------------------------------------
     echo "-----> Cleanup hacks"
