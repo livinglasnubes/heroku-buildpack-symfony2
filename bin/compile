@@ -194,6 +194,8 @@ fi
 # It solves datezone problem, possible others
 cp $LP_DIR/conf/php.ini ${PHP_INI_TEMP}
 
+cat ${PHP_INI_TEMP}|grep date.timezone
+
 # Deactivating plugins from php.ini (they won't be found)
 sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI_TEMP}
 
