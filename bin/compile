@@ -170,8 +170,8 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 
 # Php installation for bootstrap 
-PHP_TEMP_ROOT=/app/${PHP_PATH}
-PHP_INI_TEMP=${PHP_TEMP_ROOT}/bin/php.ini
+PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
+PHP_INI_TEMP=${PHP_TEMP_ROOT}/php.ini
 
 # This is clearly a hack but it allows PHP to find its php.ini
 echo "---------> Adding a php.ini in ${PHP_TEMP_ROOT} (hacky but needed)"
@@ -181,7 +181,7 @@ if [ -f ${PHP_INI_TEMP} ]; then
 fi;
 
 if [ ! -d ${PHP_TEMP_ROOT} ]; then
-    mkdir -p ${PHP_TEMP_ROOT}/bin
+    mkdir -p ${PHP_TEMP_ROOT}
 fi
 
 cp -a $LP_DIR/conf/etc.d ${PHP_TEMP_ROOT}/
