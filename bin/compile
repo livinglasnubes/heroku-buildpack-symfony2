@@ -384,13 +384,14 @@ mkdir -p client_body_temp fastcgi_temp proxy_temp scgi_temp uwsgi_temp
 if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 	/app/local/bin/newrelic-daemon -c /app/local/etc/newrelic.cfg -d error
 fi
-/app/${PHP_PATH}/sbin/php-fpm
-/app/vendor/nginx/sbin/nginx
 
 echo "Warming up Cache..."
 
 cd /app/
 php app/console cache:warmup -e prod
+
+/app/${PHP_PATH}/sbin/php-fpm
+/app/vendor/nginx/sbin/nginx
 
 EOF
 chmod +x boot.sh
