@@ -171,7 +171,7 @@ cp -n ${LP_DIR}/.profile.d/* ${BUILD_DIR}/.profile.d/
 
 # Php installation for bootstrap
 PHP_TEMP_ROOT=${BUILD_DIR}/${PHP_PATH}
-PHP_INI_TEMP=${PHP_TEMP_ROOT}/php.ini
+PHP_INI_TEMP=/app/${PHP_PATH}/php.ini
 EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
 
 # This is clearly a hack but it allows PHP to find its php.ini
