@@ -241,14 +241,12 @@ pushd ${BUILD_DIR}
             GIT_DIR_ORIG=${GIT_DIR}
             unset GIT_DIR
 
-            pushd /app/ > /dev/null
-                if [ ! -f "composer.phar" ]
-                then
-                        echo "Fetching composer.phar in `pwd`" | indent
-                        echo ${COMPOSER_URL} | indent
-                        download_url ${COMPOSER_URL}
-                fi
-            popd > /dev/null
+            if [ ! -f "composer.phar" ]
+            then
+                    echo "Fetching composer.phar" | indent
+                    echo ${COMPOSER_URL} | indent
+                    download_url ${COMPOSER_URL}
+            fi
 
             # ini parameters file
             if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
@@ -263,18 +261,12 @@ pushd ${BUILD_DIR}
                             erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
                 fi
             fi
-            
-            pushd /app/ > /dev/null
-                
-                ls -la
 
-                echo "-----> Composer install"
-                # do the deed!
-                echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
-                ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
-            
-            popd > /dev/null
-            exit 1
+            echo "-----> Composer install"
+            # do the deed!
+            echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
+            ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
+
             export GIT_DIR=${GIT_DIR_ORIG}
     fi
 
@@ -283,8 +275,10 @@ popd > /dev/null
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
 #  - for some reason cd is neccesary
-pushd ${BUILD_DIR} > /dev/null
+pushd /app/ > /dev/null
 
+    echo "-------> Moving files to `app`"
+    mv ${BUILD_DIR}/* .
     echo "-------> Running: app/console assets:install --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
