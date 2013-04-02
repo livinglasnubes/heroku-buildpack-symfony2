@@ -275,10 +275,8 @@ popd > /dev/null
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
 #  - for some reason cd is neccesary
-pushd /app/ > /dev/null
+pushd ${BUILD_DIR} > /dev/null
 
-    echo "-------> Moving files to `app`"
-    mv ${BUILD_DIR}/* .
     echo "-------> Running: app/console assets:install --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
