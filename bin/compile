@@ -287,8 +287,8 @@ pushd ${BUILD_DIR} > /dev/null
 
         
     echo "-------> We greping filenames in `pwd`"
-    grep -r ${BUILD_DIR} .
-    grep -r ${CACHE_DIR} .
+    grep -r ${BUILD_DIR} . | grep -v templates.php
+    grep -r ${CACHE_DIR} . | grep -v templates.php
 
 popd > /dev/null
 
