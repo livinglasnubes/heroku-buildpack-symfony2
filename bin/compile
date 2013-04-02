@@ -301,13 +301,13 @@ pushd ${BUILD_DIR} > /dev/null
 popd > /dev/null
 
 # ----------------------------------------- Cleanup hacks -----------------------------------------------
-    echo "-----> Cleanup hacks"
-    cp $LP_DIR/conf/php.ini ${PHP_INI}
+#    echo "-----> Cleanup hacks"
+#    cp $LP_DIR/conf/php.ini ${PHP_INI}
 
-    cat ${PHP_INI}|grep date.timezone
+#    cat ${PHP_INI}|grep date.timezone
 
     # Deactivating plugins from php.ini (they won't be found)
-    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
+#    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
 
 
 echo "-----> Installing boot script"
