@@ -164,8 +164,6 @@ pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
         
 popd $PUSHD_DEBUG
 
-    bash
-
 # ---------------------------------------- Copying config files --------------------------------------
     # Php installation for bootstrap
     PHP_ROOT=${BUILD_DIR}/${PHP_PATH}
@@ -189,6 +187,7 @@ echo "-----> Copying config files"
         cp -f $LP_DIR/conf/etc.d/* ${PHP_ROOT}/etc.d/
     fi
 
+    ls -la
 # -------------------------- Hacking config files to get apc & memcached in cli ------------------------------
 
 
