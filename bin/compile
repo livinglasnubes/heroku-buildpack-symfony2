@@ -186,8 +186,6 @@ popd > /dev/null
 
     if [ -d $LP_DIR/conf/etc.d ]; then
         cp -f $LP_DIR/conf/etc.d/* ${PHP_ROOT}/etc.d/
-        mkdir -p /app/${PHP_PATH}/etc.d/
-        cp -f $LP_DIR/conf/etc.d/* /app/${PHP_PATH}/etc.d/
     fi
 
 # -------------------------- Hacking config files to get apc & memcached in cli ------------------------------
@@ -303,13 +301,13 @@ pushd ${BUILD_DIR} > /dev/null
 popd > /dev/null
 
 # ----------------------------------------- Cleanup hacks -----------------------------------------------
-#    echo "-----> Cleanup hacks"
-#    cp $LP_DIR/conf/php.ini ${PHP_INI}
+    echo "-----> Cleanup hacks"
+    cp $LP_DIR/conf/php.ini ${PHP_INI}
 
-#    cat ${PHP_INI}|grep date.timezone
+    cat ${PHP_INI}|grep date.timezone
 
     # Deactivating plugins from php.ini (they won't be found)
-#    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
+    sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
 
 
 echo "-----> Installing boot script"
