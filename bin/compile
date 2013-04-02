@@ -244,12 +244,14 @@ pushd ${BUILD_DIR}
             GIT_DIR_ORIG=${GIT_DIR}
             unset GIT_DIR
 
-            if [ ! -f "composer.phar" ]
-            then
-                    echo "Fetching composer.phar" | indent
-                    echo ${COMPOSER_URL} | indent
-                    download_url ${COMPOSER_URL}
-            fi
+            pushd /app/ ${PUSHD_DEBUG}
+                if [ ! -f "composer.phar" ]
+                then
+                        echo "Fetching composer.phar" | indent
+                        echo ${COMPOSER_URL} | indent
+                        download_url ${COMPOSER_URL}
+                fi
+            popd ${PUSHD_DEBUG}
 
             # ini parameters file
             if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
