@@ -292,8 +292,6 @@ pushd ${BUILD_DIR} > /dev/null
         
     echo "-------> We greping filenames in `pwd`"
     echo "s/`strip_slashes $BUILD_DIR`/\/app\//g" > cache_strip.sed
-    cat cache_strip.sed
-    exit 1
     find app/cache/ -type f -print0 | xargs -0 sed -f cache_strip.sed
 
 popd > /dev/null
