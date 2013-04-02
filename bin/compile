@@ -170,7 +170,7 @@ popd $PUSHD_DEBUG
     PHP_INI=/app/${PHP_PATH}/php.ini
     EXEC_PHP=${BUILD_DIR}/${PHP_PATH}/bin/php
 
-    echo "-----> Copying config files"
+echo "-----> Copying config files"
     cp $LP_DIR/conf/php-fpm.conf ${BUILD_DIR}/${PHP_PATH}/etc/php-fpm.conf
     cp ${BUILD_DIR}/${PHP_PATH}/php/fpm/status.html ${BUILD_DIR}/web/status.html
     echo "<?php phpinfo(); ?>" > ${BUILD_DIR}/web/info.php
@@ -191,7 +191,7 @@ popd $PUSHD_DEBUG
 
 
     # This is clearly a hack but it allows PHP to find its php.ini
-    echo "---------> Adding a php.ini in ${PHP_ROOT} (hacky but needed)"
+    echo "---------> Adding a php.ini in ${PHP_INI} (hacky but needed)"
     if [ -f ${PHP_INI} ]; then
         echo "---------> A php.ini already exists in ${PHP_INI} so cannot apply the hack for our conf"
         exit 1
@@ -208,82 +208,86 @@ popd $PUSHD_DEBUG
 
     # Deactivating plugins from php.ini (they won't be found)
     sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
+    
+    echo "---------> Moving stuff to /app/"
+        OLD_APP_DIR=$LP_DIR
+        PHP_ROOT=/app/${PHP_PATH}
+        EXEC_PHP=${PHP_ROOT}/bin/php
+        pushd /app/ $PUSHD_DEBUG
+        mv OLD_APP_DIR /app/
 
-    # We need this to use PHP & APC or another caching system in Sf2 task when building assets...
-    export LD_LIBRARY_PATH="${PHP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_ROOT}/ext:${LD_LIBRARY_PATH}"
-    export PATH="${PHP_ROOT}/bin/:$PATH"
+        # We need this to use PHP & APC or another caching system in Sf2 task when building assets...
+        export LD_LIBRARY_PATH="${PHP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_ROOT}/ext:${LD_LIBRARY_PATH}"
+        export PATH="${PHP_ROOT}/bin/:$PATH"
 
 
-    echo "extension_dir=${PHP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI}
-    echo "extension=apc.so" >> ${PHP_INI}
-    echo "extension=memcache.so" >> ${PHP_INI}
-    echo "extension=memcached.so" >> ${PHP_INI}
+        echo "extension_dir=${PHP_ROOT}/lib/php/extensions/no-debug-non-zts-20100525" >> ${PHP_INI}
+        echo "extension=apc.so" >> ${PHP_INI}
+        echo "extension=memcache.so" >> ${PHP_INI}
+        echo "extension=memcached.so" >> ${PHP_INI}
 
-    # Test for php.ini
-    echo "-----> Ping php"
-    if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
-            # Check if apc & memcache[d] are here
-            echo 'Is memcache here ?'
-            ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache support'
-            echo 'Is memcached here ?'
-            ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcached support'
-            echo 'Is apc here ?'
-            ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc.enable_cli'
-    else
-        echo "---------> The php.ini was not found"
-        exit 1
-    fi
+        # Test for php.ini
+        echo "-----> Ping php"
+        if ${EXEC_PHP} -r "phpinfo();" | grep 'Configuration File'; then
+                # Check if apc & memcache[d] are here
+                echo 'Is memcache here ?'
+                ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcache support'
+                echo 'Is memcached here ?'
+                ${EXEC_PHP} -r "phpinfo();" | grep -i 'memcached support'
+                echo 'Is apc here ?'
+                ${EXEC_PHP} -r "phpinfo();" | grep -i 'apc.enable_cli'
+        else
+            echo "---------> The php.ini was not found"
+            exit 1
+        fi
 
 # ------------------------------- Composer Installation -----------------------------------
 
-pushd ${BUILD_DIR}
+        mv ${BUILD_DIR} /app/
 
-    if [ -f "composer.json" ]
-    then
-            echo "-----> Installing dependencies using Composer"
-            GIT_DIR_ORIG=${GIT_DIR}
-            unset GIT_DIR
+        if [ -f "composer.json" ]
+        then
+                echo "-----> Installing dependencies using Composer"
+                GIT_DIR_ORIG=${GIT_DIR}
+                unset GIT_DIR
 
-            if [ ! -f "composer.phar" ]
-            then
-                    echo "Fetching composer.phar" | indent
-                    echo ${COMPOSER_URL} | indent
-                    download_url ${COMPOSER_URL}
-            fi
-
-            # ini parameters file
-            if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
-                if [ -r ${BUILD_DIR}/app/config/parameters_prod.ini.erb ]; then
-                            erb ${BUILD_DIR}/app/config/parameters_prod.ini.erb > ${BUILD_DIR}/app/config/parameters.ini
+                if [ ! -f "composer.phar" ]
+                then
+                        echo "Fetching composer.phar" | indent
+                        echo ${COMPOSER_URL} | indent
+                        download_url ${COMPOSER_URL}
                 fi
-            fi
 
-            # yml parameters file
-            if [ ! -r ${BUILD_DIR}/app/config/parameters.yml ]; then
-                if [ -r ${BUILD_DIR}/app/config/parameters_prod.yml.erb ]; then
-                            erb ${BUILD_DIR}/app/config/parameters_prod.yml.erb > ${BUILD_DIR}/app/config/parameters.yml
+                # ini parameters file
+                if [ ! -r app/config/parameters.ini ]; then
+                    if [ -r app/config/parameters_prod.ini.erb ]; then
+                                erb app/config/parameters_prod.ini.erb > app/config/parameters.ini
+                    fi
                 fi
-            fi
 
-            echo "-----> Composer install"
-            # do the deed!
-            echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
-            ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
+                # yml parameters file
+                if [ ! -r app/config/parameters.yml ]; then
+                    if [ -r app/config/parameters_prod.yml.erb ]; then
+                                erb app/config/parameters_prod.yml.erb > app/config/parameters.yml
+                    fi
+                fi
 
-            export GIT_DIR=${GIT_DIR_ORIG}
-    fi
+                echo "-----> Composer install"
+                # do the deed!
+                echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
+                ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
 
-popd ${PUSHD_DEBUG}
+                export GIT_DIR=${GIT_DIR_ORIG}
+        fi
+
 
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
-#  - for some reason cd is neccesary
-pushd ${BUILD_DIR} ${PUSHD_DEBUG}
-
-    echo "-------> Running: app/console assets:install --env=${SF_ENV}"
-    ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
-    echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-    ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
+    
+        echo "-------> Running: app/console assets:install --env=${SF_ENV}"
+        ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
+        echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
+        ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
 
 popd ${PUSHD_DEBUG}
 
