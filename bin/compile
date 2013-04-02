@@ -186,6 +186,8 @@ popd > /dev/null
 
     if [ -d $LP_DIR/conf/etc.d ]; then
         cp -f $LP_DIR/conf/etc.d/* ${PHP_ROOT}/etc.d/
+        mkdir -p /app/${PHP_PATH}/etc.d/
+        cp -f $LP_DIR/conf/etc.d/* /app/${PHP_PATH}/etc.d/
     fi
 
 # -------------------------- Hacking config files to get apc & memcached in cli ------------------------------
