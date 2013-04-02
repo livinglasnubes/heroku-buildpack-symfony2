@@ -164,6 +164,8 @@ pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
         
 popd $PUSHD_DEBUG
 
+    bash
+
 # ---------------------------------------- Copying config files --------------------------------------
     # Php installation for bootstrap
     PHP_ROOT=${BUILD_DIR}/${PHP_PATH}
