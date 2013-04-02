@@ -214,7 +214,7 @@ echo "-----> Copying config files"
         PHP_ROOT=/app/${PHP_PATH}
         EXEC_PHP=${PHP_ROOT}/bin/php
         pushd /app/ $PUSHD_DEBUG
-        mv OLD_APP_DIR /app/
+        mv ${OLD_APP_DIR} /app/
 
         # We need this to use PHP & APC or another caching system in Sf2 task when building assets...
         export LD_LIBRARY_PATH="${PHP_ROOT}/icu/lib:${BUILD_DIR}/local/lib:${PHP_ROOT}/ext:${LD_LIBRARY_PATH}"
