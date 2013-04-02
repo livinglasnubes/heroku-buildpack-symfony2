@@ -42,9 +42,6 @@ COMPOSER_URL="http://getcomposer.org/composer.phar"
 PHP_PATH="vendor/php"
 NODE_PATH="vendor/node"
 
-#say where you go
-PUSHD_DEBUG="> /dev/null"
-
 # Sets the debug flag depending on Sf2 env (declared at the begeining of the file)
 export SF_DEBUG="--no-debug"
 export SF_ENV="prod"
@@ -113,7 +110,7 @@ shopt -s dotglob
 
 mkdir -p $BUILD_DIR $CACHE_DIR ${BUNDLE_DIR} ${BUILD_DIR}/local ${BUILD_DIR}/vendor/bin ${COMPOSER_HOME} ${BUILD_DIR}/.profile.d
 
-pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
+pushd ${BUNDLE_DIR} > /dev/null
 
     if [ -n "`find . -type f -atime +30`" ]
     then
@@ -162,7 +159,7 @@ pushd ${BUNDLE_DIR} ${PUSHD_DEBUG}
             export INCLUDE_PATH="${BUILD_DIR}/${NODE_PATH}/include"
 
         
-popd $PUSHD_DEBUG
+popd > /dev/null
 
 # ---------------------------------------- Copying config files --------------------------------------
     # Php installation for bootstrap
@@ -244,14 +241,14 @@ pushd ${BUILD_DIR}
             GIT_DIR_ORIG=${GIT_DIR}
             unset GIT_DIR
 
-            pushd /app/ ${PUSHD_DEBUG}
+            pushd /app/ > /dev/null
                 if [ ! -f "composer.phar" ]
                 then
-                        echo "Fetching composer.phar" | indent
+                        echo "Fetching composer.phar in `pwd`" | indent
                         echo ${COMPOSER_URL} | indent
                         download_url ${COMPOSER_URL}
                 fi
-            popd ${PUSHD_DEBUG}
+            popd > /dev/null
 
             # ini parameters file
             if [ ! -r ${BUILD_DIR}/app/config/parameters.ini ]; then
@@ -267,7 +264,7 @@ pushd ${BUILD_DIR}
                 fi
             fi
             
-            pushd /app/ ${PUSHD_DEBUG}
+            pushd /app/ > /dev/null
                 
                 ls -la
 
@@ -276,24 +273,24 @@ pushd ${BUILD_DIR}
                 echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
                 ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
             
-            popd ${PUSHD_DEBUG}
+            popd > /dev/null
             exit 1
             export GIT_DIR=${GIT_DIR_ORIG}
     fi
 
-popd ${PUSHD_DEBUG}
+popd > /dev/null
 
 # ------------------------------- Deploying assets based on hack conf -----------------------------------
 
 #  - for some reason cd is neccesary
-pushd ${BUILD_DIR} ${PUSHD_DEBUG}
+pushd ${BUILD_DIR} > /dev/null
 
     echo "-------> Running: app/console assets:install --env=${SF_ENV}"
     ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
     ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
 
-popd ${PUSHD_DEBUG}
+popd > /dev/null
 
 # ----------------------------------------- Cleanup hacks -----------------------------------------------
     echo "-----> Cleanup hacks"
