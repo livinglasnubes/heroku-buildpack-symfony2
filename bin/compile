@@ -290,9 +290,9 @@ pushd ${BUILD_DIR} > /dev/null
     ${EXEC_PHP} app/console cache:warmup --env=${SF_ENV}
 
         
-    echo "-------> We greping filenames in `pwd`"
+    echo "-------> Stripping cache dir"
     echo "s/`strip_slashes $BUILD_DIR`/\/app\//g" > cache_strip.sed
-    find app/cache/ -type f -print0 | xargs -0 sed -f cache_strip.sed
+    find app/cache/ -type f -print0 | xargs -0 sed -f cache_strip.sed --quiet
 
 popd > /dev/null
 
@@ -396,8 +396,6 @@ fi
 
 echo "Warming up Cache..."
 
-cd /app/
-rm -rf app/cache/*
 php app/console cache:warmup -e prod
 
 /app/${PHP_PATH}/sbin/php-fpm
