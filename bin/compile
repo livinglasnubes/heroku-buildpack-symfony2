@@ -398,9 +398,7 @@ if [ "\${NEW_RELIC_LICENSE_KEY}" -a ! -f /app/local/NEWRELIC_VERSION ]; then
 	/app/local/bin/newrelic-daemon -c /app/local/etc/newrelic.cfg -d error
 fi
 
-echo "Warming up Cache..."
-
-php app/console cache:warmup -e prod
+bash bin/refresh all prod
 
 /app/${PHP_PATH}/sbin/php-fpm
 /app/vendor/nginx/sbin/nginx
