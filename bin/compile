@@ -289,10 +289,14 @@ pushd ${BUILD_DIR} > /dev/null
     echo "-------> Running: app/console cache:warmup --env=${SF_ENV}"
     ${EXEC_PHP} app/console cache:warmup --env=${SF_ENV}
 
-        
+
     echo "-------> Stripping cache dir"
     echo "s/`strip_slashes $BUILD_DIR`/\/app\//g" > cache_strip.sed
     find app/cache/ -type f -print0 | xargs -0 sed -f cache_strip.sed --quiet
+    if grep -r $BUILD_DIR app/cache -m 1 ; then
+        echo "----------> Error: Could still find ${BUILD_DIR} in cache"
+        exit 1
+    fi
 
 popd > /dev/null
 
