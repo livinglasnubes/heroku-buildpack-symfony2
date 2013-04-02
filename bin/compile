@@ -63,6 +63,10 @@ function indent() {
 	esac
 }
 
+function strip_slashes() {
+  echo $(echo "$1" | sed -e "s/\//\\\\\//g")
+}
+
 function check_md5() {
 	SUMS_FILE="${BUNDLE_DIR}/${MANIFEST_FILE}"
 	TARGET="$1"
@@ -287,8 +291,10 @@ pushd ${BUILD_DIR} > /dev/null
 
         
     echo "-------> We greping filenames in `pwd`"
-    grep -r ${BUILD_DIR} . | grep -v templates.php
-    grep -r ${CACHE_DIR} . | grep -v templates.php
+    echo "s/`strip_slashes $BUILD_DIR`/\/app\//g" > cache_strip.sed
+    cat cache_strip.sed
+    exit 1
+    find app/cache/ -type f -print0 | xargs -0 sed -f cache_strip.sed
 
 popd > /dev/null
 
