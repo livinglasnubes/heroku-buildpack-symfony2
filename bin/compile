@@ -400,6 +400,7 @@ fi
 
 echo "Warming up Cache..."
 
+rm -rf app/cache/*
 php app/console cache:clear -e prod
 
 /app/${PHP_PATH}/sbin/php-fpm
