@@ -308,7 +308,11 @@ popd > /dev/null
 
     # Deactivating plugins from php.ini (they won't be found)
     sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
-
+    
+    if [ -n "${BLITZ_API_KEY}" ]; then
+    echo "-----> Dumping blitz api key"
+    echo 42 > ${BUILD_DIR}/web/${BLITZ_API_KEY}
+    fi
 
 echo "-----> Installing boot script"
 cd $BUILD_DIR
