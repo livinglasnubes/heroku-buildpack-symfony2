@@ -309,6 +309,12 @@ popd > /dev/null
     # Deactivating plugins from php.ini (they won't be found)
     sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
     
+    cp $LP_DIR/conf/php.ini ${PHP_INI}
+    
+    mkdir -p /app/vendor/php/etc.d
+    
+    cp $LP_DIR/conf/etc.d/* /app/vendor/php/etc.d
+    
     if [ -n "${BLITZ_API_KEY}" ]; then
     echo "-----> Dumping blitz api key"
     echo 42 > ${BUILD_DIR}/web/${BLITZ_API_KEY}
@@ -370,6 +376,17 @@ if [ -d /app/conf/nginx.d ]; then
 		if [ -r "\${f}" ];
 		then
 			erb "\${f}" > "\${f}.conf"
+		fi
+	done
+fi
+
+if [ -d /app/vendor/php/etc.d ]; then
+	# Parse .erb into .ini.
+	for f in /app/vendor/php/etc.d/*.erb
+	do
+		if [ -r "\${f}" ];
+		then
+			erb "\${f}" > "\${f}.ini"
 		fi
 	done
 fi
