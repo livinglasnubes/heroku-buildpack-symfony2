@@ -247,8 +247,14 @@ pushd ${BUILD_DIR}
             if [ ! -f "composer.phar" ]
             then
                     echo "Fetching composer.phar" | indent
-                    echo ${COMPOSER_URL} | indent
-                    download_url ${COMPOSER_URL}
+                    if [ -f "bin/composer" ]
+                    then
+                        echo bin/composer | indent
+                        cp bin/composer composer.phar
+                    else
+                        echo ${COMPOSER_URL} | indent
+                        download_url ${COMPOSER_URL}
+                    fi
             fi
 
             # ini parameters file
