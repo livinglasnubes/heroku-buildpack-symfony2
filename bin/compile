@@ -292,7 +292,7 @@ pushd ${BUILD_DIR} > /dev/null
     echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
     ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
     echo "-------> Running: app/console cache:warmup --env=${SF_ENV}"
-    ${EXEC_PHP} app/console cache:warmup --env=${SF_ENV}
+    ${EXEC_PHP} -d memory_limit=200M app/console cache:warmup --env=${SF_ENV}
 
 
     #echo "-------> Stripping cache dir"
