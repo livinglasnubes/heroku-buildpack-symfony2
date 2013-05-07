@@ -218,6 +218,7 @@ popd > /dev/null
     echo "extension=apc.so" >> ${PHP_INI}
     echo "extension=memcache.so" >> ${PHP_INI}
     echo "extension=memcached.so" >> ${PHP_INI}
+    echo "extension=mongo.so" >> ${PHP_INI}
 
     # Test for php.ini
     echo "-----> Ping php"

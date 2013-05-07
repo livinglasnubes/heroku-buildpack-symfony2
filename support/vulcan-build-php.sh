@@ -93,6 +93,16 @@ phpize
 make && make install
 popd
 
+echo "+ Installing Mongo DB..."
+# install Mongo DB from source
+curl -L http://pecl.php.net/get/mongo-${MONGO_VERSION}.tgz -o - | tar xz
+pushd mongo-${MONGO_VERSION}
+phpize
+./configure --with-php-config=/app/vendor/php/bin/php-config
+make && make install
+# add "extension=mongo.so" to php.ini
+popd
+
 echo "+ Installing memcache..."
 # install memcache
 
