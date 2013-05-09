@@ -275,7 +275,7 @@ pushd ${BUILD_DIR}
             echo "-----> Composer install"
             # do the deed!
             echo "Running: php composer.phar install --prefer-dist -n --no-progress " | indent
-            ${EXEC_PHP} composer.phar install --prefer-dist -n --no-progress | indent
+            ${EXEC_PHP} -d "apc.enable_cli=0" composer.phar install --prefer-dist -n --no-progress | indent
 
             export GIT_DIR=${GIT_DIR_ORIG}
     fi
