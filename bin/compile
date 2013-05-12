@@ -110,9 +110,9 @@ function install {
     
     if [ ${2: -4} == ".bz2" ]
     then
-    	tar xzf $2 -C $5
+    	tar xjf $2 -C $5
     else
-        tar xjf $2 -C $5
+        tar xzf $2 -C $5
     fi
 }
 
