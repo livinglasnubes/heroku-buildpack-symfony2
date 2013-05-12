@@ -174,7 +174,6 @@ pushd ${BUNDLE_DIR} > /dev/null
     install "PhantomJS" $PHANTOMJS_FILE $PHANTOMJS_VERSION $PHANTOMJS_URL ${BUILD_DIR}/vendor/bin
             mv "${BUILD_DIR}/vendor/bin/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs" "${BUILD_DIR}/vendor/bin/"
             rm -Rf "${BUILD_DIR}/vendor/bin/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs"
-            phantomjs -v
         
 popd > /dev/null
 
