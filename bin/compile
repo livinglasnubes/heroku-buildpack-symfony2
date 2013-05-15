@@ -327,7 +327,7 @@ popd > /dev/null
     # Deactivating plugins from php.ini (they won't be found)
     sed -i 's/extension=\(\w*\.so\)/;extension=\1/g' ${PHP_INI}
     
-    cp $LP_DIR/conf/php.ini ${PHP_INI}
+    cp -v $LP_DIR/conf/php.ini ${PHP_INI}
     
     mkdir -p /app/vendor/php/etc.d
     
