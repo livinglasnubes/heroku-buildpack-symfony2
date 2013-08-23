@@ -300,12 +300,6 @@ popd > /dev/null
 pushd ${BUILD_DIR} > /dev/null
 
     rm -rf app/cache/*
-    echo "-------> Running: app/console assets:install --env=${SF_ENV}"
-    ${EXEC_PHP} app/console assets:install --symlink  --env=${SF_ENV}
-    echo "-------> Running: app/console assetic:dump ${SF_DEBUG} --env=${SF_ENV}"
-    ${EXEC_PHP} app/console assetic:dump --env=${SF_ENV}
-    echo "-------> Running: app/console cache:warmup --env=${SF_ENV}"
-    ${EXEC_PHP} -d memory_limit=200M app/console cache:warmup --env=${SF_ENV}
 
 
     #echo "-------> Stripping cache dir"
@@ -440,8 +434,6 @@ fi
 echo "Warming up Cache..."
 
 rm -rf app/cache/*
-php app/console assets:install --symlink -e prod
-php app/console cache:clear -e prod
 
 /app/${PHP_PATH}/sbin/php-fpm
 /app/vendor/nginx/sbin/nginx
