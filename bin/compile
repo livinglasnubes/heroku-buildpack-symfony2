@@ -32,7 +32,6 @@ MEMCACHED_URL="${S3_URL}/${MEMCACHED_FILE}"
 ICU_URL="${S3_URL}/${ICU_FILE}"
 PHP_URL="${S3_URL}/${PHP_FILE}"
 NEWRELIC_URL="${S3_URL}/${NEWRELIC_FILE}"
-PHANTOMJS_URL="https://phantomjs.googlecode.com/files/${PHANTOMJS_FILE}"
 COMPOSER_URL="http://getcomposer.org/composer.phar"
 #
 
@@ -148,11 +147,6 @@ pushd ${BUNDLE_DIR} > /dev/null
 
     # newrelic
     install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/local
-
-    # PHANTOMJS
-    install "PhantomJS" $PHANTOMJS_FILE $PHANTOMJS_VERSION $PHANTOMJS_URL ${BUILD_DIR}/vendor/bin
-            mv "${BUILD_DIR}/vendor/bin/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs" "${BUILD_DIR}/vendor/bin/"
-            rm -Rf "${BUILD_DIR}/vendor/bin/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs"
         
 popd > /dev/null
 
