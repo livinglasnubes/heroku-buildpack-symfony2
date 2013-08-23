@@ -151,10 +151,6 @@ pushd ${BUNDLE_DIR} > /dev/null
     # newrelic
     install "New Relic" $NEWRELIC_FILE $NEWRELIC_VERSION $NEWRELIC_URL ${BUILD_DIR}/local
 
-
-    echo "-----> Installing less"
-            npm install -g less
-
     # PHANTOMJS
     install "PhantomJS" $PHANTOMJS_FILE $PHANTOMJS_VERSION $PHANTOMJS_URL ${BUILD_DIR}/vendor/bin
             mv "${BUILD_DIR}/vendor/bin/phantomjs-${PHANTOMJS_VERSION}-linux-x86_64/bin/phantomjs" "${BUILD_DIR}/vendor/bin/"
